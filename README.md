@@ -1,5 +1,5 @@
 <img src="sources/entanglion.jpg" align="right" width="100">
-<img src="sources/epflQuantumLogo.png" align="left" width="100">
+<img src="sources/epflQuantumLogo.png" align="right" width="100">
 
 
 
