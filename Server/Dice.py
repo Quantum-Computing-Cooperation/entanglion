@@ -5,5 +5,5 @@ class Dice:
     def __init__(self, faces):
         self.faces = faces
 
-    def __generate__(self):
+    def generate(self):
         return randrange(self.faces)
