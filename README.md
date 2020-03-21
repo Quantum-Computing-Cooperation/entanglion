@@ -34,4 +34,5 @@ This is the purpose of this github repository. Our goal is to make a virtual ver
 <a name="frontE"></a>
 ## Frontend Design
 We use the Phaser JS game engine. Here's a useful tutorial:
-https://www.youtube.com/watch?v=T9kOFSFvgKc
+https://www.youtube.com/watch?v=T9kOFSFvgKc .
+You can also download the assets we used to make the games using [this download link](https://github.com/Entanglion/entanglion/releases) . 
