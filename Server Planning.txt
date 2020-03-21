@@ -1,0 +1,9 @@
+Things to be represented:
+
+1.Quantum States (Transitions, Components)
+2.Engine Cards
+3.Events and event cards
+4.Detection Rate
+5.Dices (Centarious - binary, Entanglion - octal)
+6.Game board which contains the things above as attributes
+7.Player (Communication with the client)
