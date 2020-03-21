@@ -1,6 +1,15 @@
 <img src="sources/entanglion.jpg" align="right" width="100">
 <img src="sources/epflQuantumLogo.png" align="left" width="100">
 
+
+
+
+
+
+
+
+
+
 # Welcome to ENTANGLION
 This is a browser based realization of the IBM board game Entanglion
 
