@@ -1,3 +1,8 @@
+<img src="sources/entanglion.jpg" align="right" width="100">
+
+
+
+
 ## Entanglion
 
 # How to play the game
