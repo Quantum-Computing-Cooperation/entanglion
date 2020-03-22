@@ -16,6 +16,7 @@ This is a browser based realization of the IBM board game Entanglion
 1. [How is it played?](#howTo)
 2. [ How we made it?](#howToM)
 3. [ The frontend](#frontE)
+4. [ Selection of resources on quantum computing](#res)
 
 
 
@@ -33,6 +34,10 @@ Or we can make the game ourselves :D
 This is the purpose of this github repository. Our goal is to make a virtual version of the entanglion game.
 <a name="frontE"></a>
 ## Frontend Design
+
 We use the Phaser JS game engine. Here's a useful tutorial:
 https://www.youtube.com/watch?v=T9kOFSFvgKc .
-You can also download the assets we used to make the games using [this download link](https://github.com/Entanglion/entanglion/releases) . 
+You can also download the assets we used to make the games using [this download link](https://github.com/Entanglion/entanglion/releases)  
+<a name="howToM"></a>
+## Knowledge hub
+[Quantum Computing, a gentle introduction](http://mmrc.amss.cas.cn/tlb/201702/W020170224608150244118.pdf)
