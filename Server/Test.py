@@ -1,6 +1,4 @@
-from Dice import Dice
+from Dice import *
 
-centarious = Dice(2)
-entanglion = Dice(8)
-print(centarious.generate())
-print(entanglion.generate())
+print(Centarious.roll())
+print(Entanglion.roll())

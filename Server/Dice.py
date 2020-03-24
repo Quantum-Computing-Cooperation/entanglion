@@ -5,5 +5,9 @@ class Dice:
     def __init__(self, faces):
         self.faces = faces
 
-    def generate(self):
+    def roll(self):
         return randrange(self.faces)
+
+
+Centarious = Dice(2)
+Entanglion = Dice(8)
