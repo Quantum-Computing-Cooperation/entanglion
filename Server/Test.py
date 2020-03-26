@@ -1,4 +1,8 @@
 from Dice import *
+from Deck import *
 
-print(Centarious.roll())
-print(Entanglion.roll())
+d = Deck()
+print(d.simulatedraw());
+print(d.simulatedraw());
+print(d.simulatedraw());
+print(Entanglion.roll());
