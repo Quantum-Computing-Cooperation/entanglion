@@ -1,4 +1,4 @@
-from Enums import *
+from Util import *
 
 
 class Planet:

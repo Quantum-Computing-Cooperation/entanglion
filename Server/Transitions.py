@@ -1,5 +1,5 @@
-from Enums import *
 import Planet
+from Util import *
 
 
 def transition(player: Color, blue: Planet, red: Planet, engineCard: EngineCard):
