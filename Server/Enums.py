@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class EngineCard(Enum): # The values represent the total number of that type of card in the game
+class EngineCard(Enum):  # The values represent the total number of that type of card in the game
     H = 8
     CNOT = 7
     X = 5
@@ -14,3 +14,9 @@ class EngineCard(Enum): # The values represent the total number of that type of 
 class Color(Enum):
     Blue = 1
     Red = 2
+
+
+class Galaxy(Enum):
+    Centarious = 0
+    Superious = 1
+    Entanglion = 2
