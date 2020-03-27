@@ -1,14 +1,15 @@
-from Util import *
+from Engine import *
+from Events import *
 
 
 class Game:
-    def __init__(self, player_one, player_two, detection_rate):
-        self.player_blue = player_one
-        self.player_red = player_two
-        self.engine_control = [None] * ENGINE_CONTROL_SIZE
+    def __init__(self, player_blue, player_red, detection_rate):
+        self.player_blue = player_blue
+        self.player_red = player_red
+        self.engine_control = EngineControl()
         self.detection_rate = detection_rate
-        self.engine_stack = INIT_ENGINE_STACK
-        self.event_deck = INIT_EVENT_DECK
+        self.engine_stack = EngineStack()
+        self.event_deck = EventStack()
 
     def navigate(self):
         raise Exception("Not Implemented")
