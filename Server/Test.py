@@ -1,8 +1,6 @@
-from Dice import *
-from Deck import *
+from EngineStack import *
+from Util import *
 
-d = Deck()
-print(d.simulatedraw());
-print(d.simulatedraw());
-print(d.simulatedraw());
-print(Entanglion.roll());
+d = EngineStack()
+print(d.draw())
+print(Entanglion.roll())

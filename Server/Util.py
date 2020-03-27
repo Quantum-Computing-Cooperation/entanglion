@@ -1,19 +1,22 @@
 from enum import Enum
+from random import randrange
 
 
-class EngineCard(Enum):  # The values represent the total number of that type of card in the game
-    H = 0
-    CNOT = 1
-    X = 2
-    SWAP = 3
-    PROBE = 4
+class Dice:
+    def __init__(self, faces):
+        self.faces = faces
 
-    def total(self): self.value
+    def roll(self):
+        return randrange(self.faces)
+
+
+Centarious = Dice(2)
+Entanglion = Dice(8)
 
 
 class Color(Enum):
-    Blue = 1
-    Red = 2
+    Blue = True
+    Red = False
 
 
 class Galaxy(Enum):
