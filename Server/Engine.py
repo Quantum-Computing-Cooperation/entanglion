@@ -39,19 +39,23 @@ class EngineStack:
         return drawn
 
 
-ENGINE_CONTROL_SIZE = 6
+ENGINE_CONTROL_MAX_SIZE = 6
 
 
 class EngineControl:
     def __init__(self):
-        self.control = {i: None for i in range(6)}
+        self.control = {i: None for i in range(ENGINE_CONTROL_MAX_SIZE)}
         self.size = 0
 
     def full(self):
-        return self.size == ENGINE_CONTROL_SIZE
+        return self.size == ENGINE_CONTROL_MAX_SIZE
 
     def add(self, engineCard):
         if self.full():
             raise Exception("Engine Control full ! Engine Card cannot be added")
         self.control[self.size] = engineCard
         self.size += 1
+
+    def reset(self):
+        self.control = {i: None for i in range(ENGINE_CONTROL_MAX_SIZE)}
+        self.size = 0

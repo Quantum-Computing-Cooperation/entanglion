@@ -1,4 +1,5 @@
-import Planet
+from Engine import EngineCard
+from Planet import *
 from Util import *
 
 
@@ -8,14 +9,14 @@ def transition(player: Color, blue: Planet, red: Planet, engineCard: EngineCard)
 
     # For now, the comment "CNOT: flip your ship only if the other ship is on CENTARIOUS ONE" was ignored
     if player == Color.Blue:
-        g = blue.get_transition(engineCard, player)
-        if isinstance(g, Planet):
-            return g
+        new = blue.get_transition(engineCard, player)
+        if isinstance(new, Planet):
+            return new, red
         else:
-            return g(red)
+            return new[red], new[red]
     else:
-        g = red.get_transition(engineCard, player)
-        if isinstance(g, Planet):
-            return g
+        new = red.get_transition(engineCard, player)
+        if isinstance(new, Planet):
+            return blue, new
         else:
-            return g(blue)
+            return new[blue], new[blue]
