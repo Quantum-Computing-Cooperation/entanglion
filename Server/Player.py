@@ -1,10 +1,11 @@
 class Player:
-    def __init__(self, color):
+    def __init__(self, color, socket):
         self.color = color
         self.engine_deck = []
         self.components = []
         self.event_deck = []
         self.planet = None
+        self.socket = socket
 
     def set_engine_deck(self, engine_deck):
         self.engine_deck = engine_deck

@@ -2,7 +2,7 @@ from enum import Enum
 from random import random
 
 
-class EngineCard(Enum):  # The values represent the total number of an engine card in the game
+class EngineCard(Enum):  # The values represent the number of copies of an engine card in the game
     H = 8
     CNOT = 7
     X = 5

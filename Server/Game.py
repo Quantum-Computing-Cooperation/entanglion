@@ -1,14 +1,15 @@
 from Engine import *
 from Events import *
+from Player import *
 from Transitions import *
 
 
 class Game:
-    def __init__(self, player_blue, player_red, detection_rate):
-        self.player_blue = player_blue
-        self.player_red = player_red
+    def __init__(self, socket_one, socket_two):
+        self.player_blue = Player(Color.Blue, socket_one)
+        self.player_red = Player(Color.Red, socket_two)
         self.engine_control = EngineControl()
-        self.detection_rate = detection_rate
+        self.detection_rate = 1
         self.engine_stack = EngineStack()
         self.event_deck = EventStack()
 
