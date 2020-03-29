@@ -40,6 +40,7 @@ class EngineStack:
 
 
 ENGINE_CONTROL_MAX_SIZE = 6
+ENGINE_DECK_INIT_SIZE = 3
 
 
 class EngineControl:

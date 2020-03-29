@@ -4,10 +4,9 @@ from Util import *
 
 class Planet:
     # TODO Do we actually need name and galaxy ?
-    def __init__(self, name, galaxy, component=None):
+    def __init__(self, name, galaxy):
         self.name = name
         self.galaxy = galaxy
-        self.component = component
         self.blueTransitions = None
         self.redTransitions = None
 

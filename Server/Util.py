@@ -2,16 +2,12 @@ from enum import Enum
 from random import randrange
 
 
-class Dice:
-    def __init__(self, faces):
-        self.faces = faces
-
-    def roll(self):
-        return randrange(self.faces)
+def centarious_roll():
+    return randrange(2)
 
 
-Centarious = Dice(2)
-Entanglion = Dice(8)
+def entanglion_roll():
+    return randrange(8) + 1
 
 
 class Color(Enum):
@@ -23,3 +19,14 @@ class Galaxy(Enum):
     Centarious = 0
     Superious = 1
     Entanglion = 2
+
+
+class Component(Enum):
+    Physical_Qubits = 0
+    Qubit_Interconnect = 1
+    Dilution_Refrigerator = 2
+    Quantum_Gates = 3
+    Quantum_Programming = 4
+    Quantum_Error_Correction = 5
+    Control_Infrastructure = 6
+    Magnetic_Shielding = 7

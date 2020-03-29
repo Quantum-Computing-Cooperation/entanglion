@@ -1,6 +1,6 @@
 from Engine import EngineCard
-from Planet import *
-from Util import *
+from Planet import Planet
+from Util import Color
 
 
 def transition(player: Color, blue: Planet, red: Planet, engineCard: EngineCard):
@@ -11,12 +11,12 @@ def transition(player: Color, blue: Planet, red: Planet, engineCard: EngineCard)
     if player == Color.Blue:
         new = blue.get_transition(engineCard, player)
         if isinstance(new, Planet):
-            return new, red
+            return new
         else:
-            return new[red], new[red]
+            return new[red]
     else:
         new = red.get_transition(engineCard, player)
         if isinstance(new, Planet):
-            return blue, new
+            return new
         else:
-            return new[blue], new[blue]
+            return new[blue]

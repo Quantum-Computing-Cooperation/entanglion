@@ -1,7 +1,7 @@
 import socket
 from threading import Thread
 
-import Game
+from Game import Game
 
 
 class GameThread(Thread):
@@ -10,7 +10,7 @@ class GameThread(Thread):
         self.game = Game(socket_one, socket_two)
 
     def run(self):
-        self.game.run()
+        self.game.start()
 
 
 HOST = "127.0.0.1"
@@ -18,6 +18,7 @@ PORT = 5210
 pending_connections = {}
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Don't entirely understand what this line does
     server.bind((HOST, PORT))
     print("Server started !")
     print("Waiting for client request ...")
