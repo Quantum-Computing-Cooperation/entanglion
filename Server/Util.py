@@ -30,3 +30,10 @@ class Component(Enum):
     Quantum_Error_Correction = 5
     Control_Infrastructure = 6
     Magnetic_Shielding = 7
+
+
+class Action(Enum):
+    Navigate = 1
+    Exchange = 2
+    Retrieve = 3
+    Event = 4

@@ -1,3 +1,7 @@
+from Planet import Planet
+from Util import Color
+
+
 class Player:
     def __init__(self, color, socket):
         self.color = color
@@ -10,15 +14,23 @@ class Player:
     def send_components_map(self):
         pass
 
-    def send_init_player(self, blue, red, color):
+    def send_init_player(self, blue: int, red: int, color: Color):
         pass
 
-    def send_init_locations(self):
+    def send_locations(self, other_planet: Planet):
         pass
 
-    def send_init_engine_deck(self):
+    def send_engine_decks(self, other_engine_deck: list):
         pass
 
-# Communication Protocol
-# EC1,EC2,EC3;PLANET;COMPONENTS;EVENT_CARDS::EC1,EC2,EC3;PLANET;COMPONENTS;EVENT_CARDS::ENGINE(1->6);DET_RATE -
-# - AVAILABLE_OPTIONS/BUTTONS
+    def ask_action(self):
+        pass
+
+    def send_game_over(self, won: bool):
+        pass
+
+    def send_components(self, other_components: list):
+        pass
+
+    def send_dRate(self, detection_rate: int):
+        pass
