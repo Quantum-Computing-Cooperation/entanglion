@@ -37,3 +37,6 @@ class Action(Enum):
     Exchange = 2
     Retrieve = 3
     Event = 4
+
+
+MAX_DETECTION_RATE = 12

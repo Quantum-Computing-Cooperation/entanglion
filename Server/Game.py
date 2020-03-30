@@ -12,9 +12,9 @@ class Game:
         self.engine_control = EngineControl()
         self.detection_rate = 1
         self.curr_player = self.player_blue  # Doesn't matter @see determine_first_player
-        self.component_map = {}
         self.engine_stack = EngineStack()
         self.event_stack = EventStack()
+        self.component_map = {}
         self.distribute_components()
 
     def start(self):
@@ -28,7 +28,7 @@ class Game:
         if action == Action.Navigate:
             self.navigate(arg)
         elif action == Action.Exchange:
-            self.exchange(arg)
+            self.exchange()
         elif action == Action.Retrieve:
             self.retrieve()
         elif action == Action.Event:
@@ -36,8 +36,8 @@ class Game:
 
         game_over = self.game_over()
         if game_over:
-            self.player_blue.send_game_over(game_over)
-            self.player_red.send_game_over(game_over)
+            self.player_blue.send_game_over(self.won())
+            self.player_red.send_game_over(self.won())
             return
 
         self.change_player()
@@ -46,35 +46,43 @@ class Game:
     def navigate(self, engine_card):
         if engine_card == EngineCard.SWAP:
             if self.curr_player.planet == OMEGA0:
-                self.player_blue.planet = OMEGA3
-                self.player_red.planet = OMEGA3
+                self.set_planets(OMEGA3, OMEGA3)
             elif self.curr_player.planet == OMEGA3:
-                self.player_blue.planet = OMEGA0
-                self.player_red.planet = OMEGA0
+                self.set_planets(OMEGA0, OMEGA0)
             else:
-                p = self.player_blue.planet
-                self.player_blue.planet = self.player_red.planet
-                self.player_red.planet = p
+                self.set_planets(self.player_red.planet, self.player_blue.planet)
         else:
-            self.player_blue.planet, self.player_red.planet = \
-                transition(self.curr_player.color, self.player_blue.planet, self.player_red.planet, engine_card)
-
-        self.player_blue.send_locations(self.player_red.planet)
-        self.player_red.send_locations(self.player_blue.planet)
+            blue, red = transition(self.curr_player.color, self.player_blue.planet, self.player_red.planet, engine_card)
+            self.set_planets(blue, red)
 
         if self.player_blue.planet.galaxy == Galaxy.Entanglion:
             self.orbital_defense()
+            # Detection rate may have been increased if an event was triggered above
+            if self.game_over():
+                return
 
         self.engine_control.add(engine_card)
-        self.check_engine()
+        if self.engine_control.full():
+            self.new_event()
 
-        self.exchange(engine_card)
+        # Detection rate may have been increased if an event was triggered above
+        if self.game_over():
+            return
 
-    def exchange(self, engineCard):
+        self.exchange()
+
+    def exchange(self):
         # draw new engine card, do the necessary if it's probe
         drawn = self.engine_stack.draw()
         if drawn == EngineCard.PROBE:
-            self.handle_probe()
+            roll = entanglion_roll()
+            if roll > 4:
+                self.set_detection_rate(self.detection_rate + 1)
+                self.player_blue.send_probe_notification()
+                self.player_red.send_probe_notification()
+
+            self.engine_stack.reset()
+            self.exchange()
         else:
             self.curr_player.engine_deck += drawn
 
@@ -91,26 +99,86 @@ class Game:
             self.player_blue.send_components(self.player_red.components)
             self.player_red.send_components(self.player_blue.components)
         else:
-            self.detection_rate += 1
-            self.player_blue.send_dRate(self.detection_rate)
-            self.player_red.send_dRate(self.detection_rate)
+            self.set_detection_rate(self.detection_rate + 1)
 
     def event(self, event):
-        raise Exception("Not Implemented")
+        if event == Event.Bennett:
+            give, comp = self.curr_player.ask_bennett(len(self.other_player().components) != 0)
+            if give:
+                self.other_player().give_bennett(comp)
+            else:
+                comp = self.other_player().ask_bennett_forcefully()
+                self.curr_player.give_bennett(comp)
+        elif event == Event.Heisenberg:
+            raise Exception("Not Implemented")
+        elif event == Event.Tunnel:
+            raise Exception("Not Implemented")
+        elif event == Event.Mechanic:
+            raise Exception("Not Implemented")
+        elif event == Event.Error:
+            self.set_detection_rate(6)  # 6 corresponds to the "first 4"
+        elif event == Event.Schrodinger:
+            self.set_detection_rate(self.detection_rate + 1)
+        elif event == Event.Spooky:
+            raise Exception("Not Implemented")
+        elif event == Event.Collapse:
+            self.set_detection_rate(max(self.detection_rate - 2, 1))
+        else:
+            raise Exception("Invalid event")
 
     # Game helping functions
 
-    def check_engine(self):
-        pass
+    def new_event(self):
+        drawn = self.event_stack.draw()
+        if drawn is None:
+            self.player_blue.send_event_shuffled()
+            self.player_red.send_event_shuffled()
+            self.new_event()
+        else:
+            if drawn.can_save_for_later():
+                self.curr_player.event_deck += drawn
+                self.player_blue.send_event_decks(self.player_red.event_deck)
+                self.player_red.send_event_decks(self.player_blue.event_deck)
+                return
 
-    def handle_probe(self):
-        pass
+            self.player_blue.send_event_played(drawn)
+            self.player_red.send_event_played(drawn)
+            self.event(drawn)
 
     def orbital_defense(self):
-        pass
+        roll = entanglion_roll()
+        if roll <= self.detection_rate:
+            c_roll = centarious_roll()
+            if c_roll == 0:
+                self.set_planets(ZERO, ZERO)
+            else:
+                self.set_planets(ONE, ONE)
+            self.set_detection_rate(self.detection_rate + 1)
+            self.new_event()
+        else:
+            self.player_blue.send_orbdef_evaded()
+            self.player_red.send_orbdef_evaded()
+
+    def set_planets(self, blue, red):
+        self.player_blue.planet = blue
+        self.player_red.planet = red
+
+        self.player_blue.send_locations(self.player_red.planet)
+        self.player_red.send_locations(self.player_blue.planet)
+
+    def set_detection_rate(self, new_rate):
+        self.detection_rate = new_rate
+        self.player_blue.send_dRate(self.detection_rate)
+        self.player_red.send_dRate(self.detection_rate)
+
+    def other_player(self):
+        return self.player_blue if self.curr_player is self.player_red else self.player_red
+
+    def won(self):
+        return len(self.component_map) == 0
 
     def game_over(self):
-        return len(self.component_map) == 0
+        return self.won() or self.detection_rate == MAX_DETECTION_RATE
 
     def change_player(self):
         self.curr_player = self.player_blue if self.curr_player == self.player_red else self.player_red

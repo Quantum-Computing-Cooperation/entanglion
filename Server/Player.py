@@ -1,5 +1,6 @@
+from Events import Event
 from Planet import Planet
-from Util import Color
+from Util import *
 
 
 class Player:
@@ -33,4 +34,28 @@ class Player:
         pass
 
     def send_dRate(self, detection_rate: int):
+        pass
+
+    def send_orbdef_evaded(self):
+        pass
+
+    def send_probe_notification(self):
+        pass
+
+    def send_event_shuffled(self):
+        pass
+
+    def send_event_played(self, drawn: Event):
+        pass
+
+    def send_event_decks(self, event_deck: list):
+        pass
+
+    def ask_bennett(self, can_ask: bool):
+        pass
+
+    def give_bennett(self, comp: Component):
+        pass
+
+    def ask_bennett_forcefully(self):
         pass
