@@ -16,6 +16,9 @@ class Game:
         self.event_stack = EventStack()
         self.component_map = {}
         self.distribute_components()
+        self.ground_defenses = True
+        self.orbital_defenses = True
+        self.mechanic_deck = []
 
     def start(self):
         self.determine_first_player()
@@ -24,15 +27,29 @@ class Game:
         self.run()
 
     def run(self):
-        action, arg = self.curr_player.ask_action()
-        if action == Action.Navigate:
-            self.navigate(arg)
-        elif action == Action.Exchange:
-            self.exchange()
-        elif action == Action.Retrieve:
-            self.retrieve()
-        elif action == Action.Event:
-            self.event(arg)
+        if len(self.mechanic_deck) > 0:
+            engine_card = self.curr_player.ask_mechanic()
+            if engine_card is None:
+                self.mechanic_deck.clear()
+                self.player_blue.send_mechanic_done()
+                self.player_red.send_mechanic_done()
+            else:
+                self.orbital_defenses = False
+                self.mechanic_deck.remove(engine_card)
+                self.navigate(engine_card)
+                self.change_player()
+                self.player_blue.send_mechanic_deck(self.mechanic_deck)
+                self.player_red.send_mechanic_deck(self.mechanic_deck)
+        else:
+            action, arg = self.curr_player.ask_action()
+            if action == Action.Navigate:
+                self.navigate(arg)
+            elif action == Action.Exchange:
+                self.exchange()
+            elif action == Action.Retrieve:
+                self.retrieve()
+            elif action == Action.Event:
+                self.event(arg)
 
         game_over = self.game_over()
         if game_over:
@@ -56,10 +73,13 @@ class Game:
             self.set_planets(blue, red)
 
         if self.player_blue.planet.galaxy == Galaxy.Entanglion:
-            self.orbital_defense()
-            # Detection rate may have been increased if an event was triggered above
-            if self.game_over():
-                return
+            if self.orbital_defenses:
+                self.orbital_defense()
+                # Detection rate may have been increased if an event was triggered above
+                if self.game_over():
+                    return
+            else:
+                self.orbital_defenses = True
 
         self.engine_control.add(engine_card)
         if self.engine_control.full():
@@ -69,37 +89,45 @@ class Game:
         if self.game_over():
             return
 
-        self.exchange()
+        if len(self.mechanic_deck) == 0:  # We are not in the middle of a Mechanic event
+            self.exchange()
 
     def exchange(self):
-        # draw new engine card, do the necessary if it's probe
+        drawn = self.draw_card()
+        self.curr_player.engine_deck += drawn
+        self.player_blue.send_engine_decks(self.player_red.engine_deck)
+        self.player_red.send_engine_decks(self.player_blue.engine_deck)
+
+    def draw_card(self):
+        # Draw new engine card, do the necessary if it's probe
         drawn = self.engine_stack.draw()
         if drawn == EngineCard.PROBE:
             roll = entanglion_roll()
             if roll > 4:
                 self.set_detection_rate(self.detection_rate + 1)
-                self.player_blue.send_probe_notification()
-                self.player_red.send_probe_notification()
 
+            self.player_blue.send_probe_notification()
+            self.player_red.send_probe_notification()
             self.engine_stack.reset()
-            self.exchange()
+            return self.draw_card()
         else:
-            self.curr_player.engine_deck += drawn
-
-            self.player_blue.send_engine_decks(self.player_red.engine_deck)
-            self.player_red.send_engine_decks(self.player_blue.engine_deck)
+            return drawn
 
     def retrieve(self):
-        roll = entanglion_roll()
-        if roll > self.detection_rate:
-            component = self.component_map[self.curr_player.planet]
-            del self.component_map[self.curr_player.planet]
-            self.curr_player.components += component
-
-            self.player_blue.send_components(self.component_map, self.player_red.components)
-            self.player_red.send_components(self.component_map, self.player_blue.components)
+        if self.ground_defenses:
+            roll = entanglion_roll()
+            if roll <= self.detection_rate:
+                self.set_detection_rate(self.detection_rate + 1)
+                return
         else:
-            self.set_detection_rate(self.detection_rate + 1)
+            self.ground_defenses = True
+
+        component = self.component_map[self.curr_player.planet]
+        del self.component_map[self.curr_player.planet]
+        self.curr_player.components += component
+
+        self.player_blue.send_components(self.component_map, self.player_red.components)
+        self.player_red.send_components(self.component_map, self.player_blue.components)
 
     def event(self, event):
         if event == Event.Bennett:
@@ -116,13 +144,29 @@ class Game:
             self.set_planets(planet, planet)
 
         elif event == Event.Tunnel:
-            raise Exception("TODO")
+            orb = self.curr_player.ask_tunnel_orbital_or_ground()
+            if orb:
+                self.orbital_defenses = False
+            else:
+                self.ground_defenses = False
+            self.change_player()  # So that the curr player stays the curr player in the next turn
+
         elif event == Event.Mechanic:
-            raise Exception("TODO")
+            for i in range(3):
+                self.mechanic_deck.append(self.draw_card())
+                if self.game_over():
+                    return
+
+            self.change_player()  # So that the curr player stays the curr player in the next turn
+            self.player_blue.send_mechanic_deck(self.mechanic_deck)
+            self.player_red.send_mechanic_deck(self.mechanic_deck)
+
         elif event == Event.Error:
             self.set_detection_rate(6)  # 6 corresponds to the "first 4"
+
         elif event == Event.Schrodinger:
             self.set_detection_rate(self.detection_rate + 1)
+
         elif event == Event.Spooky:
             if len(self.curr_player.components) == 0:
                 return
@@ -142,10 +186,7 @@ class Game:
         elif event == Event.Collapse:
             self.set_detection_rate(max(self.detection_rate - 2, 1))
 
-        else:
-            raise Exception("Invalid event")
-
-    # Game helping functions
+    # Helper functions
 
     def new_event(self):
         drawn = self.event_stack.draw()

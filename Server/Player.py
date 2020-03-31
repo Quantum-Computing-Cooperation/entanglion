@@ -56,3 +56,18 @@ class Player:
 
     def ask_bennett_forcefully(self):
         pass
+
+    def ask_tunnel_orbital_or_ground(self):
+        pass
+
+    def send_mechanic_done(self):
+        pass
+
+    def mechanic(self, mechanic_deck: list, i_am_playing: bool):
+        pass
+
+    def send_mechanic_deck(self, mechanic_deck: list):
+        pass
+
+    def ask_mechanic(self):
+        pass
