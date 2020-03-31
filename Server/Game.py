@@ -96,8 +96,8 @@ class Game:
             del self.component_map[self.curr_player.planet]
             self.curr_player.components += component
 
-            self.player_blue.send_components(self.player_red.components)
-            self.player_red.send_components(self.player_blue.components)
+            self.player_blue.send_components(self.component_map, self.player_red.components)
+            self.player_red.send_components(self.component_map, self.player_blue.components)
         else:
             self.set_detection_rate(self.detection_rate + 1)
 
@@ -109,20 +109,39 @@ class Game:
             else:
                 comp = self.other_player().ask_bennett_forcefully()
                 self.curr_player.give_bennett(comp)
+
         elif event == Event.Heisenberg:
-            raise Exception("Not Implemented")
+            roll = entanglion_roll()
+            planet = CLOCKWISE_TABLE[roll]
+            self.set_planets(planet, planet)
+
         elif event == Event.Tunnel:
-            raise Exception("Not Implemented")
+            raise Exception("TODO")
         elif event == Event.Mechanic:
-            raise Exception("Not Implemented")
+            raise Exception("TODO")
         elif event == Event.Error:
             self.set_detection_rate(6)  # 6 corresponds to the "first 4"
         elif event == Event.Schrodinger:
             self.set_detection_rate(self.detection_rate + 1)
         elif event == Event.Spooky:
-            raise Exception("Not Implemented")
+            if len(self.curr_player.components) == 0:
+                return
+
+            unoccupied_planets = []
+            for i in range(8):
+                if not CLOCKWISE_TABLE[i + 1] in self.component_map:
+                    unoccupied_planets += CLOCKWISE_TABLE[i + 1]
+
+            index = entanglion_roll() % len(unoccupied_planets)
+            planet = unoccupied_planets[index]
+            component = random.choice(self.curr_player.components)
+            self.component_map[planet] = component
+            self.player_blue.send_components(self.component_map, self.player_red.components)
+            self.player_red.send_components(self.component_map, self.player_blue.components)
+
         elif event == Event.Collapse:
             self.set_detection_rate(max(self.detection_rate - 2, 1))
+
         else:
             raise Exception("Invalid event")
 
@@ -223,5 +242,5 @@ class Game:
         self.component_map[OMEGA2] = shuffled_components[6]
         self.component_map[OMEGA3] = shuffled_components[7]
 
-        self.player_blue.send_components_map()
-        self.player_red.send_components_map()
+        self.player_blue.send_components(self.component_map, [])
+        self.player_red.send_components(self.component_map, [])

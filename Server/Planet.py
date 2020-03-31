@@ -70,3 +70,5 @@ OMEGA2.set_transitions(PHI_PLUS, OMEGA3, OMEGA3, Color.Red)
 
 OMEGA3.set_transitions(PSI_PLUS, OMEGA1, None, Color.Blue)
 OMEGA3.set_transitions(PHI_MINUS, OMEGA2, OMEGA2, Color.Red)
+
+CLOCKWISE_TABLE = {1: OMEGA0, 2: OMEGA1, 3: PSI_MINUS, 4: PHI_MINUS, 5: OMEGA3, 6: OMEGA2, 7: PHI_PLUS, 8: PSI_PLUS}
