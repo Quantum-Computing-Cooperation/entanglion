@@ -63,11 +63,11 @@ class Player:
     def send_mechanic_done(self):
         pass
 
-    def mechanic(self, mechanic_deck: list, i_am_playing: bool):
-        pass
-
     def send_mechanic_deck(self, mechanic_deck: list):
         pass
 
     def ask_mechanic(self):
+        pass
+
+    def send_engine_control(self, engine_control):
         pass

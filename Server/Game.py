@@ -15,12 +15,12 @@ class Game:
         self.engine_stack = EngineStack()
         self.event_stack = EventStack()
         self.component_map = {}
-        self.distribute_components()
         self.ground_defenses = True
         self.orbital_defenses = True
         self.mechanic_deck = []
 
     def start(self):
+        self.distribute_components()
         self.determine_first_player()
         self.determine_init_locations()
         self.draw_engine_cards()
@@ -45,7 +45,7 @@ class Game:
             if action == Action.Navigate:
                 self.navigate(arg)
             elif action == Action.Exchange:
-                self.exchange()
+                self.exchange(arg)
             elif action == Action.Retrieve:
                 self.retrieve()
             elif action == Action.Event:
@@ -69,8 +69,15 @@ class Game:
             else:
                 self.set_planets(self.player_red.planet, self.player_blue.planet)
         else:
-            blue, red = transition(self.curr_player.color, self.player_blue.planet, self.player_red.planet, engine_card)
-            self.set_planets(blue, red)
+            new = transition(self.curr_player.color, self.player_blue.planet, self.player_red.planet, engine_card)
+            if new.galaxy == Galaxy.Entanglion:
+                self.set_planets(new, new)
+            else:
+                curr_color = self.curr_player.color
+                if curr_color == Color.Blue:
+                    self.set_planets(new, self.player_red.planet)
+                else:
+                    self.set_planets(self.player_blue.planet, new)
 
         if self.player_blue.planet.galaxy == Galaxy.Entanglion:
             if self.orbital_defenses:
@@ -83,18 +90,23 @@ class Game:
 
         self.engine_control.add(engine_card)
         if self.engine_control.full():
+            self.engine_control.reset()
             self.new_event()
+
+        self.player_blue.send_engine_control(self.engine_control)
+        self.player_red.send_engine_control(self.engine_control)
 
         # Detection rate may have been increased if an event was triggered above
         if self.game_over():
             return
 
         if len(self.mechanic_deck) == 0:  # We are not in the middle of a Mechanic event
-            self.exchange()
+            self.exchange(engine_card)
 
-    def exchange(self):
+    def exchange(self, thrown: EngineCard):
         drawn = self.draw_card()
-        self.curr_player.engine_deck += drawn
+        self.curr_player.engine_deck.append(drawn)
+        self.curr_player.engine_deck.remove(thrown)
         self.player_blue.send_engine_decks(self.player_red.engine_deck)
         self.player_red.send_engine_decks(self.player_blue.engine_deck)
 
@@ -103,12 +115,11 @@ class Game:
         drawn = self.engine_stack.draw()
         if drawn == EngineCard.PROBE:
             roll = entanglion_roll()
-            if roll > 4:
+            if roll <= 4:
                 self.set_detection_rate(self.detection_rate + 1)
 
             self.player_blue.send_probe_notification()
             self.player_red.send_probe_notification()
-            self.engine_stack.reset()
             return self.draw_card()
         else:
             return drawn
@@ -116,7 +127,7 @@ class Game:
     def retrieve(self):
         if self.ground_defenses:
             roll = entanglion_roll()
-            if roll <= self.detection_rate:
+            if roll <= DETECTION_MAP[self.detection_rate - 1]:
                 self.set_detection_rate(self.detection_rate + 1)
                 return
         else:
@@ -124,13 +135,15 @@ class Game:
 
         component = self.component_map[self.curr_player.planet]
         del self.component_map[self.curr_player.planet]
-        self.curr_player.components += component
+        self.curr_player.components.append(component)
 
         self.player_blue.send_components(self.component_map, self.player_red.components)
         self.player_red.send_components(self.component_map, self.player_blue.components)
 
     def event(self, event):
         if event == Event.Bennett:
+            if len(self.player_blue.components) == 0 and len(self.player_red.components) == 0:
+                return
             give, comp = self.curr_player.ask_bennett(len(self.other_player().components) != 0)
             if give:
                 self.other_player().give_bennett(comp)
@@ -174,7 +187,7 @@ class Game:
             unoccupied_planets = []
             for i in range(8):
                 if not CLOCKWISE_TABLE[i + 1] in self.component_map:
-                    unoccupied_planets += CLOCKWISE_TABLE[i + 1]
+                    unoccupied_planets.append(CLOCKWISE_TABLE[i + 1])
 
             index = entanglion_roll() % len(unoccupied_planets)
             planet = unoccupied_planets[index]
@@ -190,13 +203,13 @@ class Game:
 
     def new_event(self):
         drawn = self.event_stack.draw()
-        if drawn is None:
+        if drawn is Event.Shuffle:
             self.player_blue.send_event_shuffled()
             self.player_red.send_event_shuffled()
             self.new_event()
         else:
             if drawn.can_save_for_later():
-                self.curr_player.event_deck += drawn
+                self.curr_player.event_deck.append(drawn)
                 self.player_blue.send_event_decks(self.player_red.event_deck)
                 self.player_red.send_event_decks(self.player_blue.event_deck)
                 return
@@ -207,7 +220,7 @@ class Game:
 
     def orbital_defense(self):
         roll = entanglion_roll()
-        if roll <= self.detection_rate:
+        if roll <= DETECTION_MAP[self.detection_rate - 1]:
             c_roll = centarious_roll()
             if c_roll == 0:
                 self.set_planets(ZERO, ZERO)
@@ -247,7 +260,7 @@ class Game:
         blue, red = 0, 0
         while blue == red:
             blue, red = centarious_roll(), entanglion_roll()
-        if blue < red:
+        if blue > red:
             self.curr_player = self.player_blue
         else:
             self.curr_player = self.player_red
@@ -265,8 +278,8 @@ class Game:
 
     def draw_engine_cards(self):
         for i in range(ENGINE_DECK_INIT_SIZE):
-            self.player_blue.engine_deck += self.engine_stack.draw()
-            self.player_red.engine_deck += self.engine_stack.draw()
+            self.player_blue.engine_deck.append(self.engine_stack.draw())
+            self.player_red.engine_deck.append(self.engine_stack.draw())
 
         self.player_blue.send_engine_decks(self.player_red.engine_deck)
         self.player_red.send_engine_decks(self.player_blue.engine_deck)

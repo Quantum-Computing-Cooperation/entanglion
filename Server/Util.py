@@ -40,3 +40,4 @@ class Action(Enum):
 
 
 MAX_DETECTION_RATE = 12
+DETECTION_MAP = [1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8]
