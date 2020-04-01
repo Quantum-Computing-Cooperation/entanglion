@@ -104,15 +104,17 @@ class Game:
             self.exchange(engine_card)
 
     def exchange(self, thrown: EngineCard):
+        self.curr_player.engine_deck.remove(thrown)
         drawn = self.draw_card()
         self.curr_player.engine_deck.append(drawn)
-        self.curr_player.engine_deck.remove(thrown)
         self.player_blue.send_engine_decks(self.player_red.engine_deck)
         self.player_red.send_engine_decks(self.player_blue.engine_deck)
 
     def draw_card(self):
         # Draw new engine card, do the necessary if it's probe
         drawn = self.engine_stack.draw()
+        if self.engine_stack.empty():
+            self.engine_stack.reset(self.player_blue.engine_deck, self.player_red.engine_deck, self.mechanic_deck)
         if drawn == EngineCard.PROBE:
             roll = entanglion_roll()
             if roll <= 4:

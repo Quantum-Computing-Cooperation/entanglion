@@ -15,8 +15,14 @@ class EngineStack:
         self.stack = {e: e.value for e in EngineCard}
         self.never_reset = True
 
-    def reset(self):
+    def reset(self, blue_deck: list, red_deck: list, mechanic_deck: list):
         self.stack = {e: e.value for e in EngineCard}
+        for e in blue_deck:
+            self.stack[e] -= 1
+        for e in red_deck:
+            self.stack[e] -= 1
+        for e in mechanic_deck:
+            self.stack[e] -= 1
         self.never_reset = False
 
     def empty(self):
@@ -24,13 +30,11 @@ class EngineStack:
 
     def draw(self):
         drawn = None
-        # TODO Take into account values
-        # TODO Take into account the players' current hands
         if self.never_reset:
             del self.stack[EngineCard.PROBE]
             if self.empty():
                 return EngineCard.PROBE
-            drawn = random.choice(list(self.stack.keys()))
+            drawn = random.choice([card for card in self.stack for i in range(self.stack[card])])
             self.stack[EngineCard.PROBE] = 1
         else:
             drawn = random.choice(list(self.stack.keys()))
