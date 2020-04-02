@@ -12,30 +12,36 @@ class EngineCard(Enum):  # The values represent the number of copies of an engin
 
 class EngineStack:
     def __init__(self):
-        self.deck = {e: e.value for e in EngineCard}
+        self.stack = {e: e.value for e in EngineCard}
         self.never_reset = True
 
-    def reset(self):
-        self.deck = {e: e.value for e in EngineCard}
+    def reset(self, blue_deck: list, red_deck: list, mechanic_deck: list):
+        self.stack = {e: e.value for e in EngineCard}
+        for e in blue_deck:
+            self.stack[e] -= 1
+        for e in red_deck:
+            self.stack[e] -= 1
+        for e in mechanic_deck:
+            self.stack[e] -= 1
         self.never_reset = False
 
     def empty(self):
-        return len(self.deck) == 0
+        return len(self.stack) == 0
 
     def draw(self):
         drawn = None
         if self.never_reset:
-            del self.deck[EngineCard.PROBE]
+            del self.stack[EngineCard.PROBE]
             if self.empty():
                 return EngineCard.PROBE
-            drawn = random.choice(list(self.deck.keys()))
-            self.deck[EngineCard.PROBE] = 1
+            drawn = random.choice([card for card in self.stack for i in range(self.stack[card])])
+            self.stack[EngineCard.PROBE] = 1
         else:
-            drawn = random.choice(list(self.deck.keys()))
+            drawn = random.choice(list(self.stack.keys()))
 
-        self.deck[drawn] -= self.deck[drawn]
-        if self.deck[drawn] == 0:
-            del self.deck[drawn]
+        self.stack[drawn] -= self.stack[drawn]
+        if self.stack[drawn] == 0:
+            del self.stack[drawn]
         return drawn
 
 
@@ -45,18 +51,15 @@ ENGINE_DECK_INIT_SIZE = 3
 
 class EngineControl:
     def __init__(self):
-        self.control = {i: None for i in range(ENGINE_CONTROL_MAX_SIZE)}
-        self.size = 0
+        self.control = []
 
     def full(self):
-        return self.size == ENGINE_CONTROL_MAX_SIZE
+        return len(self.control) == ENGINE_CONTROL_MAX_SIZE
 
     def add(self, engineCard):
         if self.full():
             raise Exception("Engine Control full ! Engine Card cannot be added")
-        self.control[self.size] = engineCard
-        self.size += 1
+        self.control.append(engineCard)
 
     def reset(self):
-        self.control = {i: None for i in range(ENGINE_CONTROL_MAX_SIZE)}
-        self.size = 0
+        self.control = []
