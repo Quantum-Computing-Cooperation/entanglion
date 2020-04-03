@@ -3,7 +3,6 @@ from Util import *
 
 
 class Planet:
-    # TODO Do we actually need name and galaxy ?
     def __init__(self, name, galaxy):
         self.name = name
         self.galaxy = galaxy
@@ -11,7 +10,7 @@ class Planet:
         self.redTransitions = None
 
     # swap is mostly trivial except for omega0 and omega3, which is why it's not modeled here
-    def set_transitions(self, h, x, cnot, color=None):
+    def set_transitions(self, h, x, cnot, color=None):  # None => Blue AND Red
         transitions = {EngineCard.H: h, EngineCard.X: x, EngineCard.CNOT: cnot}
         if color == Color.Blue:
             self.blueTransitions = transitions
@@ -70,3 +69,5 @@ OMEGA2.set_transitions(PHI_PLUS, OMEGA3, OMEGA3, Color.Red)
 
 OMEGA3.set_transitions(PSI_PLUS, OMEGA1, None, Color.Blue)
 OMEGA3.set_transitions(PHI_MINUS, OMEGA2, OMEGA2, Color.Red)
+
+CLOCKWISE_TABLE = {1: OMEGA0, 2: OMEGA1, 3: PSI_MINUS, 4: PHI_MINUS, 5: OMEGA3, 6: OMEGA2, 7: PHI_PLUS, 8: PSI_PLUS}

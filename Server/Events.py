@@ -13,7 +13,7 @@ class Event(Enum):
     Spooky = -3
     Collapse = -4
 
-    # Shuffle = -5 doesn't need to be represented
+    Shuffle = -5
 
     def can_save_for_later(self):
         return self.value > 0
@@ -21,19 +21,19 @@ class Event(Enum):
 
 class EventStack:
     def __init__(self):
-        self.deck = {}
+        self.stack = {}
         self.initialize()
 
     def initialize(self):
-        self.deck = {e for e in Event}
+        self.stack = {e for e in Event}
         for i in range(3):
-            del self.deck[random.choice(list(self.deck))]
+            self.stack.remove(random.choice(self.stack))
 
     def draw(self):
-        if len(self.deck) == 0:
+        if len(self.stack) == 0:
             self.initialize()
-            return None
+            return Event.Shuffle
         else:
-            drawn = random.choice(list(self.deck))
-            del self.deck[drawn]
+            drawn = random.choice(list(self.stack))
+            del self.stack[drawn]
             return drawn

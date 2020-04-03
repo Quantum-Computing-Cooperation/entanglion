@@ -12,9 +12,6 @@ class Player:
         self.planet = None
         self.socket = socket
 
-    def send_components_map(self):
-        pass
-
     def send_init_player(self, blue: int, red: int, color: Color):
         pass
 
@@ -30,7 +27,7 @@ class Player:
     def send_game_over(self, won: bool):
         pass
 
-    def send_components(self, other_components: list):
+    def send_components(self, component_map: dict, other_components: list):
         pass
 
     def send_dRate(self, detection_rate: int):
@@ -58,4 +55,19 @@ class Player:
         pass
 
     def ask_bennett_forcefully(self):
+        pass
+
+    def ask_tunnel_orbital_or_ground(self):
+        pass
+
+    def send_mechanic_done(self):
+        pass
+
+    def send_mechanic_deck(self, mechanic_deck: list):
+        pass
+
+    def ask_mechanic(self):
+        pass
+
+    def send_engine_control(self, engine_control):
         pass
