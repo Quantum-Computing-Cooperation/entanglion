@@ -4,17 +4,30 @@ class SceneMain extends Phaser.Scene {
     }
     preload()
     {
-        this.load.image("bg", "../gameAssets/bg.png");
-        let galaxyMap = this.load.image("galaxyMap", "../gameAssets/transition-map.png");
-        galaxyMap.width = 0.2;
+        this.load.image("bg", "../gameAssets/board.jpg");
+      
+      
     }
     create() {
-        let bg = this.add.image(400,400,'bg');
-        let galaxyMap = this.add.image(200,0,'galaxyMap');
-        galaxyMap.width = 0.2;
-        console.log("Ready!, working");
+
+        /**
+         *    // we first add background image
+        let bg = this.add.image(0,0,'bg').setOrigin(0,0);
+        bg.displayHeight = game.config.height;
+        bg.displayWidth = game.config.width;
+    
+        // we define our main scene as consisting of 121 blocks 
         this.aGrid = new AlignGrid({scene:this,rows:11,columns:11});
-        this.aGrid.placeAtIndex(10,this.galaxyMap);
+        this.aGrid.placeAtIndex(40,this.galaxyMap);
+         */
+
+         //we define a grid where each object goes 
+         this.aGrid = new AlignGrid({scene:this,rows:11,columns:2});
+         
+         this.aGrid.showNumbers();
+
+        
+        
     }
     update() {}
 }

@@ -5,8 +5,8 @@ if (isMobile == -1) {
 if (isMobile == -1) {
     var config = {
         type: Phaser.AUTO,
-        width: 1980,
-        height: 1040,
+        width: window.innerWidth,
+        height: window.innerHeight,
         parent: 'phaser-game',
         scene: [SceneMain]
     };
