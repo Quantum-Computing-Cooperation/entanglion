@@ -37,7 +37,7 @@ class EngineStack:
             drawn = random.choice([card for card in self.stack for i in range(self.stack[card])])
             self.stack[EngineCard.PROBE] = 1
         else:
-            drawn = random.choice(list(self.stack.keys()))
+            drawn = random.choice([card for card in self.stack for i in range(self.stack[card])])
 
         self.stack[drawn] -= self.stack[drawn]
         if self.stack[drawn] == 0:
