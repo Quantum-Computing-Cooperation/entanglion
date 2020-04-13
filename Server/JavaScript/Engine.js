@@ -1,17 +1,26 @@
-EngineCard = Object.freeze({
-    H: 8,
-    CNOT: 7,
-    X: 5,
-    SWAP: 3,
-    PROBE: 1
+var EngineCard = Object.freeze({
+    H: 1,
+    CNOT: 2,
+    X: 3,
+    SWAP: 4,
+    PROBE: 5,
+    initial_count: {
+        1: 8,
+        2: 7,
+        3: 5,
+        4: 3,
+        5: 1
+    }
 })
+
+const EngineCards = [EngineCard.H, EngineCard.CNOT, EngineCard.X, EngineCard.SWAP, EngineCard.PROBE];
 
 class EngineStack {
     constructor() {
         this.never_reset = true;
         this.stack = new Map();
 
-        EngineCard.entries.forEach(entry => this.stack.set(entry.key, entry.value));
+        EngineCards.forEach(card => this.stack.set(card, EngineCard.initial_count[card]));
     }
 
     empty() {
@@ -19,14 +28,14 @@ class EngineStack {
     }
 
     reset(blue_deck, red_deck, mechanic_deck) {
-        EngineCard.entries.forEach(entry => this.stack.set(entry.key, entry.value));
-        function rm(item) {
-            this.stack.set(item, this.stack.get(item) - 1);
+        EngineCards.forEach(card => this.stack.set(card, EngineCard.initial_count[card]));
+        function rm(card) {
+            this.stack.set(card, this.stack.get(card) - 1);
         }
 
-        blue_deck.foreach(rm);
-        red_deck.foreach(rm);
-        mechanic_deck.foreach(rm);
+        blue_deck.forEach(rm);
+        red_deck.forEach(rm);
+        mechanic_deck.forEach(rm);
 
         this.never_reset = false;
     }
@@ -34,14 +43,14 @@ class EngineStack {
     draw () {
         drawn = null;
         function rand() {
-            array = [];
-            this.stack.entries.forEach(element => {
-                for (let i = 0; i < element.value; ++i) {
-                    array.push(element.key);
+            var array = [];
+            this.stack.forEach(function(key, value) {
+                for (let i = 0; i < value; ++i) {
+                    array.push(key);
                 }
             });
 
-            return array[Math.floor(Math.random() * array.size)];
+            return array[Math.floor(Math.random() * array.length)];
         }
 
         if (this.never_reset) {
@@ -50,7 +59,7 @@ class EngineStack {
                 return EngineCard.PROBE;
             }
             drawn = rand();
-            this.stack.set(EngineCard.PROBE.key, EngineCard.PROBE.value);
+            this.stack.set(EngineCard.PROBE, EngineCard.properties[EngineCard.PROBE]);
         } else {
             drawn = rand();
         }
@@ -73,7 +82,7 @@ class EngineControl {
     }
 
     full() {
-        this.control.size === ENGINE_CONTROL_MAX_SIZE;
+        this.control.length === ENGINE_CONTROL_MAX_SIZE;
     }
 
     add(engine_card) {

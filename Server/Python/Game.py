@@ -155,7 +155,7 @@ class Game:
 
         elif event == Event.Heisenberg:
             roll = entanglion_roll()
-            planet = CLOCKWISE_TABLE[roll]
+            planet = CLOCKWISE_TABLE[roll - 1]
             self.set_planets(planet, planet)
 
         elif event == Event.Tunnel:
@@ -188,8 +188,8 @@ class Game:
 
             unoccupied_planets = []
             for i in range(8):
-                if not CLOCKWISE_TABLE[i + 1] in self.component_map:
-                    unoccupied_planets.append(CLOCKWISE_TABLE[i + 1])
+                if not CLOCKWISE_TABLE[i] in self.component_map:
+                    unoccupied_planets.append(CLOCKWISE_TABLE[i])
 
             index = entanglion_roll() % len(unoccupied_planets)
             planet = unoccupied_planets[index]
