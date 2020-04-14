@@ -1,4 +1,6 @@
-function transition(player_color, blue_planet, red_planet, engine_card) {
+import {Color} from './Util';
+
+export function transition(player_color, blue_planet, red_planet, engine_card) {
     if (engine_card === EngineCard.SWAP || engine_card === EngineCard.PROBE) {
         throw new Error("Handle SWAP and PROBE on your own; they aren't worth my time and energy !");
     }

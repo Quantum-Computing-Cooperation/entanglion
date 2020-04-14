@@ -1,4 +1,4 @@
-var EngineCard = Object.freeze({
+export var EngineCard = Object.freeze({
     H: 1,
     CNOT: 2,
     X: 3,
@@ -13,9 +13,9 @@ var EngineCard = Object.freeze({
     }
 })
 
-const EngineCards = [EngineCard.H, EngineCard.CNOT, EngineCard.X, EngineCard.SWAP, EngineCard.PROBE];
+export const EngineCards = [EngineCard.H, EngineCard.CNOT, EngineCard.X, EngineCard.SWAP, EngineCard.PROBE];
 
-class EngineStack {
+export class EngineStack {
     constructor() {
         this.never_reset = true;
         this.stack = new Map();
@@ -73,10 +73,10 @@ class EngineStack {
     }
 }
 
-const ENGINE_CONTROL_MAX_SIZE = 6;
-const ENGINE_DECK_INIT_SIZE = 3;
+export const ENGINE_CONTROL_MAX_SIZE = 6;
+export const ENGINE_DECK_INIT_SIZE = 3;
 
-class EngineControl {
+export class EngineControl {
     constructor() {
         this.control = [];
     }

@@ -1,23 +1,23 @@
-function centarious_roll() {
+export function centarious_roll() {
     return Math.floor(Math.random() * 2);
 }
 
-function entanglion_roll() {
+export function entanglion_roll() {
     return Math.ceil(Math.random() * 8);
 }
 
-Color = Object.freeze({
+export var Color = Object.freeze({
     Blue: true,
     Red: false
 })
 
-Galaxy = Object.freeze({
+export var Galaxy = Object.freeze({
     Centarious: 0,
     Superious: 1,
     Entanglion: 2
 })
 
-Component = Object.freeze({
+export var Component = Object.freeze({
     Physical_Qubits: 0,
     Qubit_Interconnect: 1,
     Dilution_Refrigerator: 2,
@@ -28,12 +28,12 @@ Component = Object.freeze({
     Magnetic_Shielding: 7
 })
 
-Action = Object.freeze({
+export var Action = Object.freeze({
     Navigate: 1,
     Exchange: 2,
     Retrieve: 3,
     Event: 4
 })
 
-const MAX_DETECTION_RATE = 12;
-const DETECTION_MAP = [1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8];
+export const MAX_DETECTION_RATE = 12;
+export const DETECTION_MAP = [1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 7, 8];

@@ -1,4 +1,4 @@
-var Event = Object.freeze({
+export var Event = Object.freeze({
     Bennet: 1,
     Heisenberg: 2,
     Tunnel: 3,
@@ -25,9 +25,9 @@ var Event = Object.freeze({
 })
 
 // All events except Shuffle
-const Events = [Event.Bennet, Event.Heisenberg, Event.Tunnel, Event.Mechanic, Event.Error, Event.Schrodinger, Event.Spooky, Event.Collapse];
+export const Events = [Event.Bennet, Event.Heisenberg, Event.Tunnel, Event.Mechanic, Event.Error, Event.Schrodinger, Event.Spooky, Event.Collapse];
 
-class EventStack {
+export class EventStack {
     constructor() {
         this.stack = [];
         Events.forEach(event => this.stack.push(event));

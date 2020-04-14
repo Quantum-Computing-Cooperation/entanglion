@@ -1,3 +1,6 @@
+import {Color, Galaxy} from './Util';
+import {EngineCard} from './Engine';
+
 class Planet {
     constructor(name, galaxy) {
         this.name = name;
@@ -37,20 +40,20 @@ class Planet {
     }
 }
 
-const ONE = Planet("ONE", Galaxy.Centarious);
-const ZERO = Planet("ZERO", Galaxy.Centarious);
+export const ONE = Planet('ONE', Galaxy.Centarious);
+export const ZERO = Planet('ZERO', Galaxy.Centarious);
 
-const PLUS = Planet("PLUS", Galaxy.Superious);
-const MINUS = Planet("MINUS", Galaxy.Superious);
+export const PLUS = Planet('PLUS', Galaxy.Superious);
+export const MINUS = Planet('MINUS', Galaxy.Superious);
 
-const PSI_PLUS = Planet("PSI PLUS", Galaxy.Entanglion);
-const PSI_MINUS = Planet("PSI MINUS", Galaxy.Entanglion);
-const PHI_PLUS = Planet("PHI PLUS", Galaxy.Entanglion);
-const PHI_MINUS = Planet("PHI MINUS", Galaxy.Entanglion);
-const OMEGA0 = Planet("OMEGA ZERO", Galaxy.Entanglion);
-const OMEGA1 = Planet("OMEGA ONE", Galaxy.Entanglion);
-const OMEGA2 = Planet("OMEGA TWO", Galaxy.Entanglion);
-const OMEGA3 = Planet("OMEGA THREE", Galaxy.Entanglion);
+export const PSI_PLUS = Planet('PSI PLUS', Galaxy.Entanglion);
+export const PSI_MINUS = Planet('PSI MINUS', Galaxy.Entanglion);
+export const PHI_PLUS = Planet('PHI PLUS', Galaxy.Entanglion);
+export const PHI_MINUS = Planet('PHI MINUS', Galaxy.Entanglion);
+export const OMEGA0 = Planet('OMEGA ZERO', Galaxy.Entanglion);
+export const OMEGA1 = Planet('OMEGA ONE', Galaxy.Entanglion);
+export const OMEGA2 = Planet('OMEGA TWO', Galaxy.Entanglion);
+export const OMEGA3 = Planet('OMEGA THREE', Galaxy.Entanglion);
 
 // null represents an impossible transition
 ONE.set_transitions(x => MINUS, x => ZERO, x => ZERO);
