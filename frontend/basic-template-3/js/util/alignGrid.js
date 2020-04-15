@@ -14,7 +14,7 @@ class AlignGrid
 		}
 		if (!config.cols)
 		{
-			config.cols=5;
+			config.cols=10;
 		}
 		if (!config.height)
 		{
