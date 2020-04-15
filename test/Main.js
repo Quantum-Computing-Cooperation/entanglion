@@ -1,6 +1,7 @@
-import {EngineControl, EngineStack, ENGINE_DECK_INIT_SIZE} from './Engine';
-import { EventStack } from './Events';
-import {Color, Components, centarious_roll, Action, MAX_DETECTION_RATE} from './Util';
+import {EngineControl, EngineStack, ENGINE_DECK_INIT_SIZE} from './Engine.mjs';
+import { EventStack } from './Events.mjs';
+import {Color, Component, centarious_roll, Action, MAX_DETECTION_RATE} from './Util.mjs';
+import {ONE, ZERO, PLUS, MINUS, PSI_PLUS, PSI_MINUS, PHI_PLUS, PHI_MINUS, OMEGA0, OMEGA1, OMEGA2, OMEGA3, CLOCKWISE_TABLE} from './Planet.mjs';
 
 var express = require('express');
 var app = express();
@@ -15,7 +16,7 @@ app.get('/', function (req, res) {
 
 class Player {
     constructor(socket, color) {
-        this.socket = socket; // TODO is this useful ? 
+        this.socket = socket; // TODO is this useful ?
         this.color = color;
         this.engine_deck = [];
         this.event_deck = [];
@@ -42,7 +43,9 @@ var nb_players = 0;
 
 function distribute_components() {
     var shuffled = [];
-    Components.forEach(comp => shuffled.push(comp));
+    Array.prototype.forEach.call(Component, comp => {
+      shuffled.push(comp)
+    });
     game.component_map.set(PSI_PLUS, shuffled[0]);
     game.component_map.set(PSI_MINUS, shuffled[1]);
     game.component_map.set(PHI_PLUS, shuffled[2]);
@@ -70,7 +73,8 @@ function determine_first_player() {
         }
     }
 
-    io.emit('init_player', game.curr_player);
+    io.emit('init_player');
+    //call stack size exceeds when also emitting game.curr_player
 }
 
 function determine_init_locations() {
@@ -84,11 +88,11 @@ function determine_init_locations() {
 }
 
 function draw_engine_cards() {
-    for (let i = 0; i < ENGINE_DECK_INIT_SIZE; ++i) {
-        game.blue_player.engine_deck.push(game.engine_stack.draw());
-        game.red_player.engine_deck.push(game.engine_stack.draw());
-    }
-
+  //  for (let i = 0; i < ENGINE_DECK_INIT_SIZE; ++i) {
+  //      game.blue_player.engine_deck.push(game.engine_stack.draw());
+  //      game.red_player.engine_deck.push(game.engine_stack.draw());
+  //  }
+//TODO  Cannot read property 'cardStack' of undefined Engine.mjs when uncommented
     io.emit('engine_decks', game.blue_player.engine_deck, game.red_player.engine_deck);
 }
 
@@ -112,21 +116,23 @@ function change_player() {
 }
 
 function navigate(arg) {
-
+  return;
 }
 
 function exchange(arg) {
-
+  return;
 }
 
 function retrieve() {
-
+  return;
 }
 
 function event(arg) {
-
+  return;
 }
 
+
+//TODO ON PLAYER DISCONNECT DECREMENT NB_PLAYERS
 io.on('connection', function(socket) {
     if (nb_players === 0) {
         game.blue_player = new Player(socket, Color.Blue);
