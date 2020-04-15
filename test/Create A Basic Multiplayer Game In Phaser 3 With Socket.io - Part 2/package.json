@@ -1,0 +1,19 @@
+{
+  "name": "phaser_tut2",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Scott Westover",
+  "license": "ISC",
+  "dependencies": {
+    "canvas": "^2.6.1",
+    "datauri": "^2.0.0",
+    "express": "^4.17.1",
+    "jsdom": "^16.2.2",
+    "socket.io": "^2.3.0"
+  },
+  "keywords": [],
+  "description": ""
+}
