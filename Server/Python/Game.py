@@ -27,7 +27,7 @@ class Game:
         self.run()
 
     def run(self):
-        if len(self.mechanic_deck) > 0:
+        if len(self.mechanic_deck) > 1:
             engine_card = self.curr_player.ask_mechanic()
             if engine_card is None:
                 self.mechanic_deck.clear()
@@ -40,6 +40,7 @@ class Game:
                 self.change_player()
                 self.player_blue.send_mechanic_deck(self.mechanic_deck)
                 self.player_red.send_mechanic_deck(self.mechanic_deck)
+                # if the list drops to size 1, we need to send mechanic_over
         else:
             action, arg = self.curr_player.ask_action()
             if action == Action.Navigate:
