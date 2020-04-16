@@ -1,3 +1,4 @@
+
 var config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',
@@ -28,7 +29,10 @@ function create() {
   this.socket = io();
   this.otherPlayers = this.physics.add.group();
   this.socket.on('component_map', function(data) {
-    console.log('component map received', data);
+    console.log('component map received');
+    var map = new Map(JSON.parse(data));
+    for([key,value] of map)
+      console.log(key + '=' + value);
   });
   this.socket.on('init_player', function(data) {
     console.log('inti player done it is: ', data);

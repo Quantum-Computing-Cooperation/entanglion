@@ -1,6 +1,6 @@
 import {EngineControl, EngineStack, ENGINE_DECK_INIT_SIZE} from './Engine.mjs';
 import { EventStack } from './Events.mjs';
-import {Color, Component, centarious_roll, Action, MAX_DETECTION_RATE} from './Util.mjs';
+import {Color, Component, centarious_roll, entanglion_roll, Action, MAX_DETECTION_RATE} from './Util.mjs';
 import {ONE, ZERO, PLUS, MINUS, PSI_PLUS, PSI_MINUS, PHI_PLUS, PHI_MINUS, OMEGA0, OMEGA1, OMEGA2, OMEGA3, CLOCKWISE_TABLE} from './Planet.mjs';
 
 var express = require('express');
@@ -43,9 +43,8 @@ var nb_players = 0;
 
 function distribute_components() {
     var shuffled = [];
-    Array.prototype.forEach.call(Component, comp => {
-      shuffled.push(comp)
-    });
+    for(var comp in Component)
+      shuffled.push(comp);
     game.component_map.set(PSI_PLUS, shuffled[0]);
     game.component_map.set(PSI_MINUS, shuffled[1]);
     game.component_map.set(PHI_PLUS, shuffled[2]);
@@ -55,7 +54,7 @@ function distribute_components() {
     game.component_map.set(OMEGA2, shuffled[6]);
     game.component_map.set(OMEGA3, shuffled[7]);
 
-    io.emit('component_map', game.component_map);
+    io.emit('component_map', JSON.stringify(Array.from(game.component_map.entries())));
 }
 
 function determine_first_player() {
@@ -63,8 +62,8 @@ function determine_first_player() {
     var red = 0;
 
     while (blue === red) {
-        blue = centarious_roll();
-        red = centarious_roll();
+        blue = entanglion_roll();
+        red = entanglion_roll();
 
         if (blue > red) {
             game.curr_player = game.blue_player;
@@ -74,7 +73,6 @@ function determine_first_player() {
     }
 
     io.emit('init_player', game.curr_player.color);
-    //call stack size exceeds when Player class contains socket attribute
 }
 
 function determine_init_locations() {
