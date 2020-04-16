@@ -8,6 +8,10 @@ class Planet {
         this.red_transitions = new Map();
     }
 
+    toJSON() {
+        return this.name;
+    }
+
     set_transitions(h, x, cnot, color=null) {
         var transitions = new Map(); //EngineCard -> (Function(EngineCard) -> Planet)
         transitions.set(EngineCard.H, h);

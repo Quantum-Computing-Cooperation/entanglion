@@ -1,7 +1,7 @@
 import {EngineControl, EngineStack} from './Engine.mjs';
-import { EventStack } from './Events.mjs';
+import {EventStack} from './Events.mjs';
 import {Color, Component, centarious_roll, entanglion_roll, Action, MAX_DETECTION_RATE, ENGINE_DECK_INIT_SIZE} from './Util.mjs';
-import {ONE, ZERO, PLUS, MINUS, PSI_PLUS, PSI_MINUS, PHI_PLUS, PHI_MINUS, OMEGA0, OMEGA1, OMEGA2, OMEGA3, CLOCKWISE_TABLE} from './Planet.mjs';
+import {ONE, ZERO, PSI_PLUS, PSI_MINUS, PHI_PLUS, PHI_MINUS, OMEGA0, OMEGA1, OMEGA2, OMEGA3, CLOCKWISE_TABLE} from './Planet.mjs';
 
 var express = require('express');
 var app = express();
@@ -81,7 +81,7 @@ function determine_init_locations() {
     game.blue_player.planet = blue === 0 ? ZERO : ONE;
     game.red_player.planet = red === 0 ? ZERO : ONE;
 
-    io.emit('locations', game.blue_player.planet, game.red_player.planet);
+    io.emit('locations', JSON.stringify(game.blue_player.planet), JSON.stringify(game.red_player.planet));
 }
 
 function draw_engine_cards() {
