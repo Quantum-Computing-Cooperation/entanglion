@@ -73,8 +73,8 @@ function determine_first_player() {
         }
     }
 
-    io.emit('init_player');
-    //call stack size exceeds when also emitting game.curr_player
+    io.emit('init_player', game.curr_player.color);
+    //call stack size exceeds when Player class contains socket attribute
 }
 
 function determine_init_locations() {
@@ -132,11 +132,13 @@ function event(arg) {
 }
 
 
-//TODO ON PLAYER DISCONNECT DECREMENT NB_PLAYERS
 io.on('connection', function(socket) {
     if (nb_players === 0) {
         game.blue_player = new Player(socket, Color.Blue);
         nb_players++;
+        socket.on('disconnect', function () {
+          nb_players--;
+        });
         return;
     } else if (nb_players === 2) {
         socket.emit('denied', "The game is full !");
@@ -180,6 +182,9 @@ io.on('connection', function(socket) {
             game.mechanic_deck = [];
             io.emit('mechanic_done');
         }
+    });
+    socket.on('disconnect', function () {
+      nb_players--;
     });
 });
 

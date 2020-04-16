@@ -31,7 +31,7 @@ function create() {
     console.log('component map received', data);
   });
   this.socket.on('init_player', function(data) {
-    console.log('inti player done');
+    console.log('inti player done it is: ', data);
   });
   this.socket.on('locations', function(data1, data2) {
     console.log('locations: ', data1, data2);
