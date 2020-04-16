@@ -113,12 +113,44 @@ function change_player() {
     io.emit('player', game.curr_player);
 }
 
+function get_curr_player() {
+    return game.curr_player === Color.Blue ? game.blue_player : game.red_player;
+}
+
+function set_detection_rate(new_rate) {
+    game.detection_rate = new_rate;
+    io.emit('detection_rate', game.detection_rate);
+}
+
+function draw_card() {
+    var drawn = game.engine_stack.draw();
+    if (game.engine_stack.empty()) {
+        game.engine_stack.reset(game.blue_player.engine_deck, game.red_player.engine_deck, game.mechanic_deck);
+    }
+
+    if (drawn === EngineCard.PROBE) {
+        var roll = entanglion_roll();
+        if (roll <= 4) {
+            set_detection_rate(game.detection_rate + 1);
+        }
+
+        io.emit('probe_drawn');
+        return draw_card();
+    } else {
+        return drawn;
+    }
+}
+
 function navigate(arg) {
   return;
 }
 
-function exchange(arg) {
-  return;
+function exchange(card) {
+    var curr = get_curr_player();
+    curr.splice(curr.indexOf(card));
+    var drawn = draw_card();
+    curr.engine_deck.push(drawn);
+    io.emit('engine_decks', blue_player.engine_deck, red_player.engine_deck);
 }
 
 function retrieve() {
