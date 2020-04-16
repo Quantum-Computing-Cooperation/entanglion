@@ -16,7 +16,7 @@ app.get('/', function (req, res) {
 
 class Player {
     constructor(socket, color) {
-        this.socket = socket; // TODO is this useful ?
+        //this.socket = socket; // TODO is this useful ?
         this.color = color;
         this.engine_deck = [];
         this.event_deck = [];
@@ -72,7 +72,7 @@ function determine_first_player() {
         }
     }
 
-    io.emit('init_player', game.curr_player.color);
+    io.emit('init_player', game.curr_player);
 }
 
 function determine_init_locations() {
@@ -86,10 +86,10 @@ function determine_init_locations() {
 }
 
 function draw_engine_cards() {
-  //  for (let i = 0; i < ENGINE_DECK_INIT_SIZE; ++i) {
-  //      game.blue_player.engine_deck.push(game.engine_stack.draw());
-  //      game.red_player.engine_deck.push(game.engine_stack.draw());
-  //  }
+    for (let i = 0; i < ENGINE_DECK_INIT_SIZE; ++i) {
+        game.blue_player.engine_deck.push(game.engine_stack.draw());
+        game.red_player.engine_deck.push(game.engine_stack.draw());
+    }
 //TODO  Cannot read property 'cardStack' of undefined Engine.mjs when uncommented
     io.emit('engine_decks', game.blue_player.engine_deck, game.red_player.engine_deck);
 }
