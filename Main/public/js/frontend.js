@@ -1,8 +1,8 @@
 var config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',
-  width: 800,
-  height: 600,
+  width: 1600,
+  height: 1200,
   physics: {
     default: 'arcade',
     arcade: {
@@ -20,13 +20,16 @@ var config = {
 var game = new Phaser.Game(config);
 
 function preload() {
-
+    this.load.image("background", "assets/BOARD1.png");
 }
 
 function create() {
   var self = this;
   this.socket = io();
-  this.otherPlayers = this.physics.add.group();
+  this.background = this.add.image(0, 0, "background");
+  this.background.setOrigin(0, 0);
+
+
   this.socket.on('component_map', function(data) {
     console.log('component map received');
     var map = new Map(JSON.parse(data));
