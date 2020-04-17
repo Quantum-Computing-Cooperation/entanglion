@@ -1,6 +1,6 @@
 import {EngineControl, EngineStack} from './Engine.mjs';
-import {EventStack} from './Events.mjs';
-import {Color, Component, centarious_roll, entanglion_roll, Action, MAX_DETECTION_RATE, ENGINE_DECK_INIT_SIZE} from './Util.mjs';
+import {EventStack, Event} from './Events.mjs';
+import {DETECTION_MAP, Color, Component, centarious_roll, entanglion_roll, Action, MAX_DETECTION_RATE, ENGINE_DECK_INIT_SIZE} from './Util.mjs';
 import {ONE, ZERO, PSI_PLUS, PSI_MINUS, PHI_PLUS, PHI_MINUS, OMEGA0, OMEGA1, OMEGA2, OMEGA3, CLOCKWISE_TABLE} from './Planet.mjs';
 
 var express = require('express');
@@ -40,66 +40,6 @@ var game = {
 
 var nb_players = 0;
 
-function distribute_components() {
-    var shuffled = [];
-    for(var comp in Component)
-      shuffled.push(comp);
-    game.component_map.set(PSI_PLUS, shuffled[0]);
-    game.component_map.set(PSI_MINUS, shuffled[1]);
-    game.component_map.set(PHI_PLUS, shuffled[2]);
-    game.component_map.set(PHI_MINUS, shuffled[3]);
-    game.component_map.set(OMEGA0, shuffled[4]);
-    game.component_map.set(OMEGA1, shuffled[5]);
-    game.component_map.set(OMEGA2, shuffled[6]);
-    game.component_map.set(OMEGA3, shuffled[7]);
-
-    io.emit('component_map', JSON.stringify(Array.from(game.component_map.entries())));
-}
-
-function determine_first_player() {
-    var blue = 0;
-    var red = 0;
-
-    while (blue === red) {
-        blue = entanglion_roll();
-        red = entanglion_roll();
-
-        if (blue > red) {
-            game.curr_player = Color.Blue;
-        } else {
-            game.curr_player = Color.Red;
-        }
-    }
-
-    io.emit('player', game.curr_player);
-}
-
-function determine_init_locations() {
-    var blue = centarious_roll();
-    var red = centarious_roll();
-
-    game.blue_player.planet = blue === 0 ? ZERO : ONE;
-    game.red_player.planet = red === 0 ? ZERO : ONE;
-
-    io.emit('locations', JSON.stringify(game.blue_player.planet), JSON.stringify(game.red_player.planet));
-}
-
-function draw_engine_cards() {
-    for (let i = 0; i < ENGINE_DECK_INIT_SIZE; ++i) {
-        game.blue_player.engine_deck.push(game.engine_stack.draw());
-        game.red_player.engine_deck.push(game.engine_stack.draw());
-    }
-    
-    io.emit('engine_decks', game.blue_player.engine_deck, game.red_player.engine_deck);
-}
-
-function start() {
-    distribute_components();
-    determine_first_player();
-    determine_init_locations();
-    draw_engine_cards();
-}
-
 function won() {
     return game.component_map.size === 0;
 }
@@ -129,8 +69,8 @@ function draw_card() {
     }
 
     if (drawn === EngineCard.PROBE) {
-        var roll = entanglion_roll();
-        if (roll <= 4) {
+        var roll = DETECTION_MAP[entanglion_roll() - 1];
+        if (roll < 4) {
             set_detection_rate(game.detection_rate + 1);
         }
 
@@ -139,6 +79,73 @@ function draw_card() {
     } else {
         return drawn;
     }
+}
+
+function set_locations(one, two) {
+    game.blue_player.planet = one;
+    game.red_player.planet = two;
+
+    io.emit('locations', JSON.stringify(game.blue_player.planet), JSON.stringify(game.red_player.planet));
+}
+
+function distribute_components() {
+    var shuffled = [];
+    for(var comp in Component)
+      shuffled.push(comp);
+    game.component_map.set(PSI_PLUS, shuffled[0]);
+    game.component_map.set(PSI_MINUS, shuffled[1]);
+    game.component_map.set(PHI_PLUS, shuffled[2]);
+    game.component_map.set(PHI_MINUS, shuffled[3]);
+    game.component_map.set(OMEGA0, shuffled[4]);
+    game.component_map.set(OMEGA1, shuffled[5]);
+    game.component_map.set(OMEGA2, shuffled[6]);
+    game.component_map.set(OMEGA3, shuffled[7]);
+
+    io.emit('components', JSON.stringify(Array.from(game.component_map.entries())), game.blue_player.components, game.red_player.components);
+}
+
+function determine_first_player() {
+    var blue = 0;
+    var red = 0;
+
+    while (blue === red) {
+        blue = entanglion_roll();
+        red = entanglion_roll();
+
+        if (blue > red) {
+            game.curr_player = Color.Blue;
+        } else {
+            game.curr_player = Color.Red;
+        }
+    }
+
+    io.emit('player', game.curr_player);
+}
+
+function determine_init_locations() {
+    var blue = centarious_roll();
+    var red = centarious_roll();
+
+    one = blue === 0 ? ZERO : ONE;
+    two = red === 0 ? ZERO : ONE;
+
+    set_locations(one, two);
+}
+
+function draw_engine_cards() {
+    for (let i = 0; i < ENGINE_DECK_INIT_SIZE; ++i) {
+        game.blue_player.engine_deck.push(game.engine_stack.draw());
+        game.red_player.engine_deck.push(game.engine_stack.draw());
+    }
+    
+    io.emit('engine_decks', game.blue_player.engine_deck, game.red_player.engine_deck);
+}
+
+function start() {
+    distribute_components();
+    determine_first_player();
+    determine_init_locations();
+    draw_engine_cards();
 }
 
 function navigate(arg) {
@@ -154,11 +161,75 @@ function exchange(card) {
 }
 
 function retrieve() {
-  return;
+    if (game.ground_defenses) {
+        var roll = DETECTION_MAP[entanglion_roll() - 1];
+        if (roll <= DETECTION_MAP[game.detection_rate - 1]) {
+            set_detection_rate(game.detection_rate + 1);
+            return;
+        }
+    } else {
+        game.ground_defenses = true;
+    }
+
+    var comp = game.component_map[get_curr_player().planet];
+    game.component_map.remove(get_curr_player().planet);
+    get_curr_player().components.push(comp);
+
+    io.emit('components', JSON.stringify(Array.from(game.component_map.entries())), game.blue_player.components, game.red_player.components);
 }
 
-function event(arg) {
-  return;
+function event(ev) {
+    switch (ev) {
+        case Event.Bennet:
+            if (game.blue_player.components.length === 0 && game.red_player.components.length === 0) {
+                return;
+            }
+            // TODO
+        case Event.Heisenberg:
+            var roll = entanglion_roll();
+            var planet = CLOCKWISE_TABLE[roll - 1];
+            set_locations(planet, planet);
+            break;
+        case Event.Tunnel:
+            // TODO
+        case Event.Mechanic:
+            for (var i = 0; i < 3; ++i) {
+                game.mechanic_deck.push(draw_card());
+                if (game_over()) {
+                    return;
+                }
+            }
+
+            change_player();
+            io.emit('mechanic_deck', game.mechanic_deck);
+            break;
+        case Event.Error:
+            set_detection_rate(6); // 6 corresponds to the "first 4"
+            break;
+        case Event.Schrodinger:
+            set_detection_rate(game.detection_rate + 1);
+            break;
+        case Event.Spooky:
+            if (curr_player().components.length === 0) {
+                return;
+            }
+
+            var unoccupied_planets = [];
+            for (var i = 0; i < 8; ++i) {
+                if (!game.component_map.has(CLOCKWISE_TABLE[i])) {
+                    unoccupied_planets.push(CLOCKWISE_TABLE[i]);
+                }
+            }
+
+            var index = entanglion_roll % unoccupied_planets.length;
+            var planet = unoccupied_planets[index];
+            var comp = curr_player().components[Math.floor(Math.random() * curr_player().components.length)];
+            game.component_map.set(planet, comp);
+            io.emit('components', JSON.stringify(Array.from(game.component_map.entries())), game.blue_player.components, game.red_player.components);
+            break;
+        case Event.Collapse:
+            set_detection_rate(Math.max(game.detection_rate - 2, 1))
+    } 
 }
 
 io.on('connection', function(socket) {
