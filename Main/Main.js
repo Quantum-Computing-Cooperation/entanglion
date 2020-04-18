@@ -126,8 +126,8 @@ function determine_init_locations() {
     var blue = centarious_roll();
     var red = centarious_roll();
 
-    one = blue === 0 ? ZERO : ONE;
-    two = red === 0 ? ZERO : ONE;
+    var one = blue === 0 ? ZERO : ONE;
+    var two = red === 0 ? ZERO : ONE;
 
     set_locations(one, two);
 }
