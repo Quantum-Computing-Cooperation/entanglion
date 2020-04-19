@@ -1,13 +1,8 @@
 var config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',
-<<<<<<< HEAD:Main/public/frontend.js
   width: 1200,
   height: 700,
-=======
-  width: 1600,
-  height: 1200,
->>>>>>> 4e34bff65b9510204c70ef35cd9a4f2d7ac160bd:Main/public/js/frontend.js
   physics: {
     default: 'arcade',
     arcade: {
@@ -27,12 +22,8 @@ var quantumCompSet = [];
 var image = [];
 
 function preload() {
-<<<<<<< HEAD:Main/public/frontend.js
-    this.load.image('bg', 'assets/BOARD.png');
+    this.load.image('bg', 'assets/BOARD1.png');
     this.load.atlas('quantumComp','assets/quantum_components/sprites.png','assets/quantum_components/quantumSprites.json');
-=======
-    this.load.image("background", "assets/BOARD1.png");
->>>>>>> 4e34bff65b9510204c70ef35cd9a4f2d7ac160bd:Main/public/js/frontend.js
 }
 
 function create() {
