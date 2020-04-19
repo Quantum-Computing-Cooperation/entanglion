@@ -1,4 +1,4 @@
-export var Event = Object.freeze({
+export const Event = Object.freeze({
     Bennet: 1,
     Heisenberg: 2,
     Tunnel: 3,
