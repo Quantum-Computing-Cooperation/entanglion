@@ -1,0 +1,48 @@
+BOARD SIZE: width: 1600, height:1200 
+=========//=========
+ENGINE CONTROL :
+================
+(600,42); size: width: 113, height:120, ditance between each 19 pxs
+=================================//=================================
+
+components:
+===========
+Size: widht:97, height:103;
+OMEGA ZERO: (962, 262)
+OMEGA ONE: (1161, 262)
+OMEGA TWO: (963, 834)
+OMEGA THREE: (1161 , 835)
+PSI PLUS: (845,436)
+PHI PLUS: (848, 671)
+PSI MINUS: (1273 , 440)
+PHI MINUS: (1273 , 674)
+
+ONE: (594, 438); size: widht: 93, heigth: 99
+ZERO: (652, 669); size: widht: 93, heigth: 99
+PLUS: (851, 943); size: widht: 89, heigth: 95
+MINUS: (1275, 1028); size: widht: 89, heigth: 95
+======================//=========================
+
+DETECTION RATE:
+===============
+size: width: 38, height: 47
+01: (48, 342);
+02: (88, 342);
+03: (128, 342);
+04: (168, 342);
+05: (208, 342);
+06: (248, 342);
+07: (68, 379);
+08: (108, 379);
+09: (148, 379);
+10: (188, 379);
+11: (228, 379);
+12: (268, 379);
+
+ENGINE STACK EMPTY:
+===================
+(181, 41); size: width: 115 ,heiht: 122
+
+QUANTUM EVENT DECK EMPTY:
+=========================
+(256, 807); size: width: 187 height: 274
