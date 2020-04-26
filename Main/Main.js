@@ -64,11 +64,14 @@ function game_over() {
 
 function change_player() {
     game.curr_player = game.curr_player === Color.Blue ? Color.Red : Color.Blue;
-    send_curr_player();
 }
 
 function get_curr_player() {
     return game.curr_player === Color.Blue ? game.blue_player : game.red_player;
+}
+
+function get_other_player() {
+    return game.curr_player === Color.Blue ? game.red_player : game.blue_player;
 }
 
 function set_detection_rate(new_rate) {
@@ -198,14 +201,18 @@ function event(ev) {
             if (game.blue_player.components.length === 0 && game.red_player.components.length === 0) {
                 return;
             }
+
+            get_curr_player().emit('ask_bennet', get_other_player().components.length !== 0);
             // TODO
+
         case Event.Heisenberg:
             var roll = entanglion_roll();
             var planet = CLOCKWISE_TABLE[roll - 1];
             set_locations(planet, planet);
             break;
         case Event.Tunnel:
-            // TODO
+            change_player();
+            //TODO
         case Event.Mechanic:
             for (var i = 0; i < 3; ++i) {
                 game.mechanic_deck.push(draw_card());
@@ -213,7 +220,6 @@ function event(ev) {
                     return;
                 }
             }
-
             change_player();
             io.emit('mechanic_deck', game.mechanic_deck);
             break;
@@ -278,6 +284,7 @@ io.on('connection', function(socket) {
         }
 
         change_player();
+        send_curr_player();
     });
 
     socket.on('mechanic', function(cont, card) {
@@ -292,12 +299,22 @@ io.on('connection', function(socket) {
                 io.emit('mechanic_done');
             } else {
                 change_player();
+                send_curr_player();
             }
 
         } else {
             game.mechanic_deck = [];
             io.emit('mechanic_done');
         }
+    });
+
+    socket.on('tunnel', function(orbital) {
+        if (oribtal) {
+            game.orbital_defenses = false;
+        } else {
+            game.ground_defenses = false;
+        }
+        //TODO
     });
 
     socket.on('disconnect', function () {
