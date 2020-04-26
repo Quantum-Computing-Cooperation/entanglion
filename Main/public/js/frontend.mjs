@@ -1,3 +1,5 @@
+import {planetScaleEnum as scaleEnum} from './scaling.mjs';
+
 var config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',
@@ -17,9 +19,31 @@ var config = {
   }
 };
 
+
+function shuffle(arra1) {
+  var ctr = arra1.length, temp, index;
+
+// While there are elements in the array
+  while (ctr > 0) {
+// Pick a random index
+      index = Math.floor(Math.random() * ctr);
+// Decrease ctr by 1
+      ctr--;
+// And swap the last element with it
+      temp = arra1[ctr];
+      arra1[ctr] = arra1[index];
+      arra1[index] = temp;
+  }
+  return arra1;
+}
+
 var game = new Phaser.Game(config);
 var quantumCompSet = [];
 var image = [];
+let planets = shuffle(Object.values(scaleEnum).splice(1,8));
+console.log(planets);
+
+
 
 function preload() {
     this.load.image('bg', 'assets/BOARD1.png');
@@ -30,16 +54,34 @@ function create() {
 
   var bg = this.add.image(0,0,'bg').setOrigin(0,0);
   var draggableObject = this.add.group();
-  bg.displayWidth = 1200;
-  bg.displayHeight = 700;
+  bg.displayWidth = config.width;
+  bg.displayHeight = config.height;
   quantumCompSet = this.textures.get('quantumComp').getFrameNames();
 
-  for(var i = 0; i<8;i++){
-    image[i] = this.add.sprite(Math.random()*1000+50,Math.random()*600 + 50,'quantumComp',quantumCompSet[i]).setInteractive().setScale(0.2);
-    this.input.setDraggable(image[i]);
-    draggableObject.add(image[i]);
+
+
+  image[0] = this.add.sprite((962/1600)*config.width,(262/1200)*config.height,'quantumComp',quantumCompSet[i]).setInteractive().setOrigin(0,0);
+  image[0].displayWidth = (97/1600)*config.width;
+  image[0].displayHeight = (103/1200)*config.height;
+
+
+
+
+  // creating and adding quantum components 
+  for(var i = 0; i<8;i++){  
+    let currentValues = planets[i]
+    image[i] = this.add.sprite(currentValues[0]*config.width,currentValues[1]*config.height,'quantumComp',quantumCompSet[i]).setInteractive().setOrigin(0,0);
+    image[i].displayWidth = (97/1600)*config.width;
+    image[i].displayHeight = (103/1200)*config.height;
   }
 
+
+
+
+
+
+
+  /** 
   this.input.on('gameobjectover', function(pointer, draggableObject){
     draggableObject.setTint(0x000022);
   })
@@ -61,11 +103,6 @@ function create() {
     draggableObject.clearTint();
   })
  
-  
-
-  
-
-  /** 
   var self = this;
   this.socket = io();
   this.background = this.add.image(0, 0, "background");
