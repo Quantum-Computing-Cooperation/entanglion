@@ -51,21 +51,16 @@ function preload() {
 }
 
 function create() {
-
+  this.socket = io();
   var bg = this.add.image(0,0,'bg').setOrigin(0,0);
   var draggableObject = this.add.group();
   bg.displayWidth = config.width;
   bg.displayHeight = config.height;
   quantumCompSet = this.textures.get('quantumComp').getFrameNames();
 
-
-
   image[0] = this.add.sprite((962/1600)*config.width,(262/1200)*config.height,'quantumComp',quantumCompSet[i]).setInteractive().setOrigin(0,0);
   image[0].displayWidth = (97/1600)*config.width;
   image[0].displayHeight = (103/1200)*config.height;
-
-
-
 
   // creating and adding quantum components 
   for(var i = 0; i<8;i++){  
@@ -75,11 +70,13 @@ function create() {
     image[i].displayHeight = (103/1200)*config.height;
   }
 
-
-
-
-
-
+  this.socket.on('components', function(component_map, blue_comps, red_comps) {
+    console.log('components received');
+    
+    var map = new Map(JSON.parse(component_map));
+    for ([key,value] of map)
+      console.log(key + '=' + value);
+  });
 
   /** 
   this.input.on('gameobjectover', function(pointer, draggableObject){
@@ -108,13 +105,6 @@ function create() {
   this.background = this.add.image(0, 0, "background");
   this.background.setOrigin(0, 0);
 
-
-  this.socket.on('component_map', function(data) {
-    console.log('component map received');
-    var map = new Map(JSON.parse(data));
-    for([key,value] of map)
-      console.log(key + '=' + value);
-  });
   this.socket.on('init_player', function(data) {
     console.log('inti player done it is: ', data);
   });
