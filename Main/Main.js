@@ -46,10 +46,8 @@ var game = {
     mechanic_deck: []
 }
 
-<<<<<<< HEAD
 
 var nb_players = 0;
-=======
 function send_locations() {
     io.emit('locations', JSON.stringify(game.blue_player.planet), JSON.stringify(game.red_player.planet));
 }
@@ -65,7 +63,6 @@ function send_curr_player() {
 function send_engine_decks() {
     io.emit('engine_decks', game.blue_player.engine_deck, game.red_player.engine_deck);
 }
->>>>>>> 7d0aa90ad691f2c6a52e555d458577f1a4edc987
 
 function won() {
     return game.component_map.size === 0;
@@ -266,11 +263,6 @@ function event(ev) {
 }
 
 
-<<<<<<< HEAD
-=======
-var nb_players = 0;
-
->>>>>>> 7d0aa90ad691f2c6a52e555d458577f1a4edc987
 io.on('connection', function(socket) {
 
     socket.emit('init', quantumComponentIndices);
