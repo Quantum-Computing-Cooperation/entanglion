@@ -1,9 +1,9 @@
 {
   "name": "phaser_tut2",
   "version": "1.0.0",
-  "main": "Main/Main.js",
+  "main": "Main/Server.js",
   "scripts": {
-    "start": "node -r esm Main/Main.js"
+    "start": "node -r esm Main/Server.js"
   },
   "author": "QCA",
   "license": "ISC",

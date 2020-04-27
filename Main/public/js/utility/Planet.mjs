@@ -87,3 +87,17 @@ OMEGA3.set_transitions(x => PSI_PLUS, x => OMEGA1, x => null, Color.Blue);
 OMEGA3.set_transitions(x => PHI_MINUS, x => OMEGA2, x => OMEGA2, Color.Red);
 
 export const CLOCKWISE_TABLE = [OMEGA0, OMEGA1, PSI_MINUS, PHI_MINUS, OMEGA3, OMEGA2, PHI_PLUS, PSI_PLUS];
+export const PLANET_FROM_NAME = Object.freeze({
+    'ONE': ONE,
+    'ZERO': ZERO,
+    'PLUS': PLUS,
+    'MINUS': MINUS,
+    'PSI PLUS': PSI_PLUS,
+    'PSI MINUS': PSI_MINUS,
+    'PHI PLUS': PHI_PLUS,
+    'PHI MINUS': PHI_MINUS,
+    'OMEGA ZERO': OMEGA0,
+    'OMEGA ONE': OMEGA1,
+    'OMEGA TWO': OMEGA2,
+    'OMEGA THREE': OMEGA3
+});

@@ -1,8 +1,7 @@
-import {EngineControl, EngineStack} from './Engine.mjs';
-import {EventStack, Event} from './Events.mjs';
-import {DETECTION_MAP, Color, Component, centarious_roll, entanglion_roll, Action, MAX_DETECTION_RATE, ENGINE_DECK_INIT_SIZE} from './Util.mjs';
-import {ONE, ZERO, PSI_PLUS, PSI_MINUS, PHI_PLUS, PHI_MINUS, OMEGA0, OMEGA1, OMEGA2, OMEGA3, CLOCKWISE_TABLE} from './Planet.mjs';
-import Dealer from './public/js/helperClasses/componentDealer.mjs'
+import {EngineControl, EngineStack} from './public/js/utility/Engine.mjs';
+import {EventStack, Event} from './public/js/utility/Events.mjs';
+import {DETECTION_MAP, Color, Component, centarious_roll, entanglion_roll, Action, MAX_DETECTION_RATE, ENGINE_DECK_INIT_SIZE} from './public/js/utility/Util.mjs';
+import {ONE, ZERO, CLOCKWISE_TABLE} from './public/js/utility/Planet.mjs';
 
 var express = require('express');
 var app = express();
@@ -25,13 +24,6 @@ class Player {
     }
 }
 
-//initializing quantum component placement 
-console.log(new Dealer());
-
-
-this.dealer = new Dealer();
-const quantumComponentIndices = this.dealer.dealCards();
-
 var game = {
     blue_player: null,
     red_player: null,
@@ -40,20 +32,19 @@ var game = {
     curr_player: null,
     engine_stack: new EngineStack(),
     event_stack: new EventStack(),
-    component_map: new Map(),
+    component_map: [], // Components arranged according to the CLOCKWISE_TABLE of planets
+    components_left: 8,
     ground_defenses: true,
     orbital_defenses: true,
     mechanic_deck: []
 }
 
-
-var nb_players = 0;
 function send_locations() {
     io.emit('locations', JSON.stringify(game.blue_player.planet), JSON.stringify(game.red_player.planet));
 }
 
 function send_components() {
-    io.emit('components', JSON.stringify(Array.from(game.component_map.entries())), game.blue_player.components, game.red_player.components);
+    io.emit('components', game.component_map, game.blue_player.components, game.red_player.components);
 }
 
 function send_curr_player() {
@@ -65,7 +56,7 @@ function send_engine_decks() {
 }
 
 function won() {
-    return game.component_map.size === 0;
+    return game.components_left === 0;
 }
 
 function game_over() {
@@ -76,7 +67,7 @@ function change_player() {
     game.curr_player = game.curr_player === Color.Blue ? Color.Red : Color.Blue;
 }
 
-function get_curr_player() {
+function curr_player() {
     return game.curr_player === Color.Blue ? game.blue_player : game.red_player;
 }
 
@@ -116,18 +107,30 @@ function set_locations(one, two) {
 }
 
 function distribute_components() {
-    var shuffled = [];
-    for(var comp in Component)
-      shuffled.push(comp);
-    game.component_map.set(PSI_PLUS, shuffled[0]);
-    game.component_map.set(PSI_MINUS, shuffled[1]);
-    game.component_map.set(PHI_PLUS, shuffled[2]);
-    game.component_map.set(PHI_MINUS, shuffled[3]);
-    game.component_map.set(OMEGA0, shuffled[4]);
-    game.component_map.set(OMEGA1, shuffled[5]);
-    game.component_map.set(OMEGA2, shuffled[6]);
-    game.component_map.set(OMEGA3, shuffled[7]);
+    function shuffle(array) {
+        var ctr = array.length, temp, index;
+      
+      // While there are elements in the array
+        while (ctr > 0) {
+      // Pick a random index
+            index = Math.floor(Math.random() * ctr);
+      // Decrease ctr by 1
+            ctr--;
+      // And swap the last element with it
+            temp = array[ctr];
+            array[ctr] = array[index];
+            array[index] = temp;
+        }
 
+        return array;
+    }
+
+    for(var comp in Component)
+      game.component_map.push(comp);
+
+
+    shuffle(game.component_map);
+    
     send_components();
 }
 
@@ -173,6 +176,7 @@ function start() {
     determine_first_player();
     determine_init_locations();
     draw_engine_cards();
+    set_detection_rate(game.detection_rate);
 }
 
 function navigate(arg) {
@@ -180,7 +184,7 @@ function navigate(arg) {
 }
 
 function exchange(card) {
-    var curr = get_curr_player();
+    var curr = curr_player();
     curr.splice(curr.indexOf(card));
     var drawn = draw_card();
     curr.engine_deck.push(drawn);
@@ -198,10 +202,10 @@ function retrieve() {
         game.ground_defenses = true;
     }
 
-    var comp = game.component_map[get_curr_player().planet];
-    game.component_map.remove(get_curr_player().planet);
-    get_curr_player().components.push(comp);
-
+    var comp_index = CLOCKWISE_TABLE.indexOf(curr_player().planet);
+    var comp = game.component_map[comp_index];
+    game.component_map[comp_index] = null;
+    curr_player().components.push(comp);
     send_components();
 }
 
@@ -212,7 +216,7 @@ function event(ev) {
                 return;
             }
 
-            get_curr_player().emit('ask_bennet', get_other_player().components.length !== 0);
+            curr_player().emit('ask_bennet', get_other_player().components.length !== 0);
             // TODO
 
         case Event.Heisenberg:
@@ -246,7 +250,7 @@ function event(ev) {
 
             var unoccupied_planets = [];
             for (var i = 0; i < 8; ++i) {
-                if (!game.component_map.has(CLOCKWISE_TABLE[i])) {
+                if (game.component_map[i] != null) {
                     unoccupied_planets.push(CLOCKWISE_TABLE[i]);
                 }
             }
@@ -254,7 +258,7 @@ function event(ev) {
             var index = entanglion_roll % unoccupied_planets.length;
             var planet = unoccupied_planets[index];
             var comp = curr_player().components[Math.floor(Math.random() * curr_player().components.length)];
-            game.component_map.set(planet, comp);
+            game.component_map[index] = comp;
             send_components();
             break;
         case Event.Collapse:
@@ -262,16 +266,9 @@ function event(ev) {
     } 
 }
 
+var nb_players = 0;
 
 io.on('connection', function(socket) {
-
-    socket.emit('init', quantumComponentIndices);
-    console.log('a user connected');
-    socket.on('disconnect', function () {
-      console.log('user disconnected');
-    })
-    
-    
     if (nb_players === 0) {
         game.blue_player = new Player(Color.Blue);
         socket.emit('color', Color.Blue);
@@ -283,7 +280,6 @@ io.on('connection', function(socket) {
         start();
     } else {
         socket.emit('denied', "The game is full !");
-        console.log("im full");
     }
 
     socket.on('action', function(action, arg) {
@@ -336,6 +332,7 @@ io.on('connection', function(socket) {
 
     socket.on('disconnect', function () {
       nb_players--;
+      throw new Error("A player disconnected, game over"); // Could be improved to let the player rejoin
     });
 });
 

@@ -1,4 +1,6 @@
-import { planetScaleEnum as scaleEnum } from './scaling.mjs';
+import { planetScaleEnum as scaleEnum } from './utility/scaling.mjs';
+import {CLOCKWISE_TABLE, PLANET_FROM_NAME} from './utility/Planet.mjs';
+import {Component, Color} from './utility/Util.mjs';
 
 var config = {
 	type: Phaser.AUTO,
@@ -19,13 +21,10 @@ var config = {
 	}
 };
 
-
 var game = new Phaser.Game(config);
 var quantumCompSet = [];
 var eventCardSet = [];
 var image = [];
-
-
 
 function preload() {
     this.load.image('bg', 'assets/BOARD1.png');
@@ -34,14 +33,60 @@ function preload() {
 }
 
 function create() {
-
   this.socket = io();
   
-
   var bg = this.add.image(0,0,'bg').setOrigin(0,0);
   bg.displayWidth = config.width;
   bg.displayHeight = config.height;
 
+  // TODO place engine cards and event cards faced down on their stacks
+
+  /* Whenever an argument is received for which there is an enum in Utility,
+  /  we need to do Enum_Name[argument] to obtain the correct value
+  */
+
+  this.socket.on('color', (color) => {
+    var my_color = Color[color];
+    // TODO assign the color to this player
+  });
+
+  this.socket.on('components', (component_map, blue_components, red_components) => {
+    // component_map[i] is the component to be placed at scaleEnum[i]
+
+    quantumCompSet = this.textures.get('quantumComp').getFrameNames();
+
+    for (var i = 0; i < 8; ++i) {
+      var comp = Component[component_map[i]];
+      var planet = scaleEnum[CLOCKWISE_TABLE[i].toJSON()];
+      image[i] = this.add.sprite(planet[0] * config.width, planet[1] * config.height, 'quantumComp', quantumCompSet[comp]).setInteractive().setOrigin(0, 0);
+      image[i].displayWidth = (97 / 1600) * config.width;
+      image[i].displayHeight = (103 / 1200) * config.height;
+    }
+
+    // TODO : assign the player components using blue_components and red_components
+  });
+
+  this.socket.on('current_player', (curr_player_color) => {
+    var color = Color[curr_player_color];
+    // TODO : assign if it's this player's turn depending upon curr_player_color
+  });
+
+  this.socket.on('locations', (blue_location, red_location) => {
+    var blue_planet = PLANET_FROM_NAME[blue_location];
+    var red_planet = PLANET_FROM_NAME[red_location];
+
+    // TODO : move the spaceships to their corresponding planets
+  });
+
+  this.socket.on('engine_decks', (blue, red) => {
+    // TODO : update interface according to the decks received
+  });
+
+  this.socket.on('detection_rate', (rate) => {
+    // TODO : update detection rate of the game
+  });
+
+  /*
   // creating and adding quantum components,event cards and engine cards all shuffles 
   this.socket.on('init', (quantumComponentIndices,eventIndices)=>{
     
@@ -64,10 +109,7 @@ function create() {
       image[i].displayHeight = (274 / 1200) * config.height;
     }
 
-  })
-  
-
-  
+  })*/
 
 
   /** 

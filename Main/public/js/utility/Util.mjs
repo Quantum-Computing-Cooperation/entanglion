@@ -7,41 +7,41 @@ export function entanglion_roll() {
 }
 
 export const Color = Object.freeze({
-    Blue: true,
-    Red: false
+    'Blue': 0,
+    'Red': 1
 });
 
 export const Galaxy = Object.freeze({
-    Centarious: 0,
-    Superious: 1,
-    Entanglion: 2
+    'Centarious': 0,
+    'Superious': 1,
+    'Entanglion': 2
 });
 
 export const Component = Object.freeze({
-    Physical_Qubits: 0,
-    Qubit_Interconnect: 1,
-    Dilution_Refrigerator: 2,
-    Quantum_Gates: 3,
-    Quantum_Programming: 4,
-    Quantum_Error_Correction: 5,
-    Control_Infrastructure: 6,
-    Magnetic_Shielding: 7
+    'Physical_Qubits': 3,
+    'Qubit_Interconnect': 6,
+    'Dilution_Refrigerator': 2,
+    'Quantum_Gates': 1,
+    'Quantum_Programming': 4,
+    'Quantum_Error_Correction': 5,
+    'Control_Infrastructure': 7,
+    'Magnetic_Shielding': 0
 });
 
 export const Action = Object.freeze({
-    Navigate: 1,
-    Exchange: 2,
-    Retrieve: 3,
-    Event: 4
+    'Navigate': 1,
+    'Exchange': 2,
+    'Retrieve': 3,
+    'Event': 4
 });
 
 export const EngineCard = Object.freeze({
-    H: 1,
-    CNOT: 2,
-    X: 3,
-    SWAP: 4,
-    PROBE: 5,
-    initial_count: {
+    'H': 1,
+    'CNOT': 2,
+    'X': 3,
+    'SWAP': 4,
+    'PROBE': 5,
+    'initial_count': {
         1: 8,
         2: 7,
         3: 5,
