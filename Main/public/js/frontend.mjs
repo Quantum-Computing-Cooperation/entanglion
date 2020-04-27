@@ -20,65 +20,45 @@ var config = {
 };
 
 
-function shuffle(arra1) {
-  var ctr = arra1.length, temp, index;
-
-// While there are elements in the array
-  while (ctr > 0) {
-// Pick a random index
-      index = Math.floor(Math.random() * ctr);
-// Decrease ctr by 1
-      ctr--;
-// And swap the last element with it
-      temp = arra1[ctr];
-      arra1[ctr] = arra1[index];
-      arra1[index] = temp;
-  }
-  return arra1;
-}
-
 var game = new Phaser.Game(config);
 var quantumCompSet = [];
 var image = [];
-let planets = shuffle(Object.values(scaleEnum).splice(1,8));
-console.log(planets);
 
 
 
 function preload() {
     this.load.image('bg', 'assets/BOARD1.png');
     this.load.atlas('quantumComp','assets/quantum_components/sprites.png','assets/quantum_components/quantumSprites.json');
+    
 }
 
 function create() {
 
+  this.socket = io();
+  
+
   var bg = this.add.image(0,0,'bg').setOrigin(0,0);
-  var draggableObject = this.add.group();
   bg.displayWidth = config.width;
   bg.displayHeight = config.height;
-  quantumCompSet = this.textures.get('quantumComp').getFrameNames();
-
-
-
-  image[0] = this.add.sprite((962/1600)*config.width,(262/1200)*config.height,'quantumComp',quantumCompSet[i]).setInteractive().setOrigin(0,0);
-  image[0].displayWidth = (97/1600)*config.width;
-  image[0].displayHeight = (103/1200)*config.height;
-
-
-
 
   // creating and adding quantum components 
-  for(var i = 0; i<8;i++){  
-    let currentValues = planets[i]
-    image[i] = this.add.sprite(currentValues[0]*config.width,currentValues[1]*config.height,'quantumComp',quantumCompSet[i]).setInteractive().setOrigin(0,0);
-    image[i].displayWidth = (97/1600)*config.width;
-    image[i].displayHeight = (103/1200)*config.height;
-  }
 
+  this.socket.on('init', (quantumComponentIndices)=>{
+    console.log("yep");
+    
+    // creating and adding quantum components 
+    quantumCompSet = this.textures.get('quantumComp').getFrameNames();
+    let planets = quantumComponentIndices;
+    for (var i = 0; i < 8; i++) {
+      let currentValues = planets[i]
+      image[i] = this.add.sprite(currentValues[0] * config.width, currentValues[1] * config.height, 'quantumComp', quantumCompSet[i]).setInteractive().setOrigin(0, 0);
+      image[i].displayWidth = (97 / 1600) * config.width;
+      image[i].displayHeight = (103 / 1200) * config.height;
+    }
+  })
+  
 
-
-
-
+  
 
 
   /** 

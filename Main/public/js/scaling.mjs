@@ -11,6 +11,5 @@ export const planetScaleEnum = {
     "phiPlus": [(848/1600),(671/1200)],
     "psiMinus": [(1273/1600),(440/1200)],
     "phiMinus": [(1273/1600),(674/1200)],
-    "planetNames": ["omegaZero", "omegaOne","omegaTwo", "omegaThree","psiPlus","phiPlus","psiMinus","phiMinus"],
 };
 

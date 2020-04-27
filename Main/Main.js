@@ -2,6 +2,7 @@ import {EngineControl, EngineStack} from './Engine.mjs';
 import {EventStack, Event} from './Events.mjs';
 import {DETECTION_MAP, Color, Component, centarious_roll, entanglion_roll, Action, MAX_DETECTION_RATE, ENGINE_DECK_INIT_SIZE} from './Util.mjs';
 import {ONE, ZERO, PSI_PLUS, PSI_MINUS, PHI_PLUS, PHI_MINUS, OMEGA0, OMEGA1, OMEGA2, OMEGA3, CLOCKWISE_TABLE} from './Planet.mjs';
+import Dealer from './public/js/helperClasses/componentDealer.mjs'
 
 var express = require('express');
 var app = express();
@@ -24,6 +25,13 @@ class Player {
     }
 }
 
+//initializing quantum component placement 
+console.log(new Dealer());
+
+
+this.dealer = new Dealer();
+const quantumComponentIndices = this.dealer.dealCards();
+
 var game = {
     blue_player: null,
     red_player: null,
@@ -37,6 +45,7 @@ var game = {
     orbital_defenses: true,
     mechanic_deck: []
 }
+
 
 var nb_players = 0;
 
@@ -232,7 +241,16 @@ function event(ev) {
     } 
 }
 
+
 io.on('connection', function(socket) {
+
+    socket.emit('init', quantumComponentIndices);
+    console.log('a user connected');
+    socket.on('disconnect', function () {
+      console.log('user disconnected');
+    })
+    
+    
     if (nb_players === 0) {
         game.blue_player = new Player(Color.Blue);
         socket.emit('color', Color.Blue);
@@ -244,6 +262,7 @@ io.on('connection', function(socket) {
         start();
     } else {
         socket.emit('denied', "The game is full !");
+        console.log("im full");
     }
 
     socket.on('action', function(color, action, arg) {
@@ -291,6 +310,8 @@ io.on('connection', function(socket) {
 server.listen(6969, function(){
     console.log('listening');
 });
+
+
 
 /*
 socket.emit('message', "this is a test"); //sending to sender-client only
