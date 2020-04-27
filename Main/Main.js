@@ -46,8 +46,26 @@ var game = {
     mechanic_deck: []
 }
 
+<<<<<<< HEAD
 
 var nb_players = 0;
+=======
+function send_locations() {
+    io.emit('locations', JSON.stringify(game.blue_player.planet), JSON.stringify(game.red_player.planet));
+}
+
+function send_components() {
+    io.emit('components', JSON.stringify(Array.from(game.component_map.entries())), game.blue_player.components, game.red_player.components);
+}
+
+function send_curr_player() {
+    io.emit('current_player', game.curr_player);
+}
+
+function send_engine_decks() {
+    io.emit('engine_decks', game.blue_player.engine_deck, game.red_player.engine_deck);
+}
+>>>>>>> 7d0aa90ad691f2c6a52e555d458577f1a4edc987
 
 function won() {
     return game.component_map.size === 0;
@@ -59,11 +77,14 @@ function game_over() {
 
 function change_player() {
     game.curr_player = game.curr_player === Color.Blue ? Color.Red : Color.Blue;
-    io.emit('player', game.curr_player);
 }
 
 function get_curr_player() {
     return game.curr_player === Color.Blue ? game.blue_player : game.red_player;
+}
+
+function get_other_player() {
+    return game.curr_player === Color.Blue ? game.red_player : game.blue_player;
 }
 
 function set_detection_rate(new_rate) {
@@ -94,7 +115,7 @@ function set_locations(one, two) {
     game.blue_player.planet = one;
     game.red_player.planet = two;
 
-    io.emit('locations', JSON.stringify(game.blue_player.planet), JSON.stringify(game.red_player.planet));
+    send_locations();
 }
 
 function distribute_components() {
@@ -110,7 +131,7 @@ function distribute_components() {
     game.component_map.set(OMEGA2, shuffled[6]);
     game.component_map.set(OMEGA3, shuffled[7]);
 
-    io.emit('components', JSON.stringify(Array.from(game.component_map.entries())), game.blue_player.components, game.red_player.components);
+    send_components();
 }
 
 function determine_first_player() {
@@ -128,7 +149,7 @@ function determine_first_player() {
         }
     }
 
-    io.emit('player', game.curr_player);
+    send_curr_player();
 }
 
 function determine_init_locations() {
@@ -147,7 +168,7 @@ function draw_engine_cards() {
         game.red_player.engine_deck.push(game.engine_stack.draw());
     }
     
-    io.emit('engine_decks', game.blue_player.engine_deck, game.red_player.engine_deck);
+    send_engine_decks();
 }
 
 function start() {
@@ -166,7 +187,7 @@ function exchange(card) {
     curr.splice(curr.indexOf(card));
     var drawn = draw_card();
     curr.engine_deck.push(drawn);
-    io.emit('engine_decks', blue_player.engine_deck, red_player.engine_deck);
+    send_engine_decks();
 }
 
 function retrieve() {
@@ -184,7 +205,7 @@ function retrieve() {
     game.component_map.remove(get_curr_player().planet);
     get_curr_player().components.push(comp);
 
-    io.emit('components', JSON.stringify(Array.from(game.component_map.entries())), game.blue_player.components, game.red_player.components);
+    send_components();
 }
 
 function event(ev) {
@@ -193,14 +214,18 @@ function event(ev) {
             if (game.blue_player.components.length === 0 && game.red_player.components.length === 0) {
                 return;
             }
+
+            get_curr_player().emit('ask_bennet', get_other_player().components.length !== 0);
             // TODO
+
         case Event.Heisenberg:
             var roll = entanglion_roll();
             var planet = CLOCKWISE_TABLE[roll - 1];
             set_locations(planet, planet);
             break;
         case Event.Tunnel:
-            // TODO
+            change_player();
+            //TODO
         case Event.Mechanic:
             for (var i = 0; i < 3; ++i) {
                 game.mechanic_deck.push(draw_card());
@@ -208,7 +233,6 @@ function event(ev) {
                     return;
                 }
             }
-
             change_player();
             io.emit('mechanic_deck', game.mechanic_deck);
             break;
@@ -234,7 +258,7 @@ function event(ev) {
             var planet = unoccupied_planets[index];
             var comp = curr_player().components[Math.floor(Math.random() * curr_player().components.length)];
             game.component_map.set(planet, comp);
-            io.emit('components', JSON.stringify(Array.from(game.component_map.entries())), game.blue_player.components, game.red_player.components);
+            send_components();
             break;
         case Event.Collapse:
             set_detection_rate(Math.max(game.detection_rate - 2, 1))
@@ -242,6 +266,11 @@ function event(ev) {
 }
 
 
+<<<<<<< HEAD
+=======
+var nb_players = 0;
+
+>>>>>>> 7d0aa90ad691f2c6a52e555d458577f1a4edc987
 io.on('connection', function(socket) {
 
     socket.emit('init', quantumComponentIndices);
@@ -265,7 +294,7 @@ io.on('connection', function(socket) {
         console.log("im full");
     }
 
-    socket.on('action', function(color, action, arg) {
+    socket.on('action', function(action, arg) {
         switch (action) {
             case Action.Navigate: navigate(arg); break;
             case Action.Exchange: exchange(arg); break;
@@ -280,6 +309,7 @@ io.on('connection', function(socket) {
         }
 
         change_player();
+        send_curr_player();
     });
 
     socket.on('mechanic', function(cont, card) {
@@ -294,12 +324,22 @@ io.on('connection', function(socket) {
                 io.emit('mechanic_done');
             } else {
                 change_player();
+                send_curr_player();
             }
 
         } else {
             game.mechanic_deck = [];
             io.emit('mechanic_done');
         }
+    });
+
+    socket.on('tunnel', function(orbital) {
+        if (oribtal) {
+            game.orbital_defenses = false;
+        } else {
+            game.ground_defenses = false;
+        }
+        //TODO
     });
 
     socket.on('disconnect', function () {

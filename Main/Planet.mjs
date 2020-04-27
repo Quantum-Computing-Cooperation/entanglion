@@ -13,7 +13,7 @@ class Planet {
     }
 
     set_transitions(h, x, cnot, color=null) {
-        var transitions = new Map(); //EngineCard -> (Function(EngineCard) -> Planet)
+        var transitions = new Map(); //Key: EngineCard, Value: (EngineCard -> Planet)
         transitions.set(EngineCard.H, h);
         transitions.set(EngineCard.X, x);
         transitions.set(EngineCard.CNOT, cnot);
