@@ -87,4 +87,8 @@ export class EngineControl {
     reset() {
         this.control = [];
     }
+
+    get() {
+        return this.control;
+    }
 }

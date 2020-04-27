@@ -1,7 +1,7 @@
 import {EngineControl, EngineStack} from './public/js/utility/Engine.mjs';
 import {EventStack, Event} from './public/js/utility/Events.mjs';
 import {DETECTION_MAP, Color, Component, centarious_roll, entanglion_roll, Action, MAX_DETECTION_RATE, ENGINE_DECK_INIT_SIZE} from './public/js/utility/Util.mjs';
-import {ONE, ZERO, CLOCKWISE_TABLE} from './public/js/utility/Planet.mjs';
+import {ONE, ZERO, CLOCKWISE_TABLE, transition} from './public/js/utility/Planet.mjs';
 
 var express = require('express');
 var app = express();
@@ -53,6 +53,10 @@ function send_curr_player() {
 
 function send_engine_decks() {
     io.emit('engine_decks', game.blue_player.engine_deck, game.red_player.engine_deck);
+}
+
+function send_engine_control() {
+    io.emit('engine_control', game.engine_control.get());
 }
 
 function won() {
@@ -179,8 +183,51 @@ function start() {
     set_detection_rate(game.detection_rate);
 }
 
-function navigate(arg) {
-  return;
+function navigate(engine_card) {
+    if (engine_card === EngineCard.SWAP) {
+        if (curr_player().planet === OMGEGA0) {
+            set_locations(OMEGA3, OMEGA3);
+        } else if (curr_player().planet === OMEGA3) {
+            set_locations(OMEGA0, OMEGA0);
+        } else {
+            set_locations(game.red_player.planet, game.blue_player.planet);
+        }
+    } else {
+        var dest = transition(game.curr_player, game.blue_player.planet, game.red_player.planet, engine_card);
+        if (dest.galaxy === Galaxy.Entanglion) {
+            set_locations(dest, dest);
+        } else {
+            if (game.curr_player === Color.BLUE) {
+                set_locations(dest, game.red_player.planet);
+            } else {
+                set_locations(game.blue_player.planet, dest);
+            }
+        }
+    }
+
+    if (game.blue_player.planet.galaxy === Galaxy.Entanglion) {
+        if (game.orbital_defenses) {
+            orbital_defense(); // TODO
+            // Detection rate may have increased if an event was triggered abvoe
+            if (game_over()) return;
+        } else {
+            game.orbital_defenses = true;
+        }
+    }
+
+    game.engine_control.push(engine_card);
+    if (game.engine_control.full()) {
+        game.engine_control.reset();
+        new_event(); // TODO
+    }
+
+    send_engine_control();
+
+    // Detection rate may have increased if an event was triggered above
+    if (game_over()) return;
+
+    // If we are not in the middle of a Mechanic event
+    if (game.mechanic_deck.length === 0) exchange(engine_card);
 }
 
 function exchange(card) {
