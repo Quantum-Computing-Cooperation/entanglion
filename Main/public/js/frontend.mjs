@@ -22,6 +22,7 @@ var config = {
 
 var game = new Phaser.Game(config);
 var quantumCompSet = [];
+var eventCardSet = [];
 var image = [];
 
 
@@ -29,7 +30,7 @@ var image = [];
 function preload() {
     this.load.image('bg', 'assets/BOARD1.png');
     this.load.atlas('quantumComp','assets/quantum_components/sprites.png','assets/quantum_components/quantumSprites.json');
-    
+    this.load.atlas('events','assets/event_cards/events.png','assets/event_cards/sprites.json');
 }
 
 function create() {
@@ -41,10 +42,8 @@ function create() {
   bg.displayWidth = config.width;
   bg.displayHeight = config.height;
 
-  // creating and adding quantum components 
-
-  this.socket.on('init', (quantumComponentIndices)=>{
-    console.log("yep");
+  // creating and adding quantum components,event cards and engine cards all shuffles 
+  this.socket.on('init', (quantumComponentIndices,eventIndices)=>{
     
     // creating and adding quantum components 
     quantumCompSet = this.textures.get('quantumComp').getFrameNames();
@@ -55,6 +54,16 @@ function create() {
       image[i].displayWidth = (97 / 1600) * config.width;
       image[i].displayHeight = (103 / 1200) * config.height;
     }
+
+    //adding event cards 
+    eventCardSet = this.textures.get('events').getFrameNames();
+    let events = [(256/1600),(807/1200)];
+    for (var i = 0; i < 10; i++) {
+      image[i] = this.add.sprite(events[0] * config.width, events[1] * config.height, 'events', eventCardSet[i]).setInteractive().setOrigin(0, 0);
+      image[i].displayWidth = (187 / 1600) * config.width;
+      image[i].displayHeight = (274 / 1200) * config.height;
+    }
+
   })
   
 
