@@ -1,6 +1,7 @@
 import { planetScaleEnum as scaleEnum } from './utility/scaling.mjs';
 import {CLOCKWISE_TABLE, PLANET_FROM_NAME} from './utility/Planet.mjs';
 import {Component, Color} from './utility/Util.mjs';
+import { COMPONENT_WIDTH, IMAGE_HEIGHT, IMAGE_WIDTH, COMPONENT_HEIGHT } from './utility/scaling.mjs';
 
 var config = {
 	type: Phaser.AUTO,
@@ -56,11 +57,11 @@ function create() {
     quantumCompSet = this.textures.get('quantumComp').getFrameNames();
 
     for (var i = 0; i < 8; ++i) {
-      var comp = Component[component_map[i]];
-      var planet = scaleEnum[CLOCKWISE_TABLE[i].toJSON()];
-      image[i] = this.add.sprite(planet[0] * config.width, planet[1] * config.height, 'quantumComp', quantumCompSet[comp]).setInteractive().setOrigin(0, 0);
-      image[i].displayWidth = (97 / 1600) * config.width;
-      image[i].displayHeight = (103 / 1200) * config.height;
+      var comp = Component[component_map[i]]; // To get the component (which is basically the index in the image file)
+      var planet_scale_values = scaleEnum[CLOCKWISE_TABLE[i].toJSON()];
+      image[i] = this.add.sprite(planet_scale_values[0] * config.width, planet_scale_values[1] * config.height, 'quantumComp', quantumCompSet[comp]).setInteractive().setOrigin(0, 0);
+      image[i].displayWidth = (COMPONENT_WIDTH / IMAGE_WIDTH) * config.width;
+      image[i].displayHeight = (COMPONENT_HEIGHT / IMAGE_HEIGHT) * config.height;
     }
 
     // TODO : assign the player components using blue_components and red_components

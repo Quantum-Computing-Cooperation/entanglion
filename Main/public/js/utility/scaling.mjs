@@ -1,14 +1,19 @@
+
 // this stores all relative scale values as an enum
+export const IMAGE_WIDTH = 1600;
+export const IMAGE_HEIGHT = 1200;
+export const COMPONENT_WIDTH = 97;
+export const COMPONENT_HEIGHT = 103;
 
 export const planetScaleEnum = {
     // arrayStructure: widthScale, heightScale
-    "OMEGA ZERO": [(962/1600),(262/1200)],
-    "OMEGA ONE": [(1161/1600),(262/1200)],
-    "PSI MINUS": [(1273/1600),(440/1200)],
-    "PHI MINUS": [(1273/1600),(674/1200)],
-    "OMEGA THREE": [(1161/1600),(835/1200)],
-    "OMEGA TWO": [(963/1600),(834/1200)],
-    "PHI PLUS": [(848/1600),(671/1200)],
-    "PSI PLUS": [(845/1600),(436/1200)],
-    "quantumCompScale": [(97/1600),(103/1200)],
+    "OMEGA ZERO": [(962/IMAGE_WIDTH),(262/IMAGE_HEIGHT)],
+    "OMEGA ONE": [(1161/IMAGE_WIDTH),(262/IMAGE_HEIGHT)],
+    "PSI MINUS": [(1273/IMAGE_WIDTH),(440/IMAGE_HEIGHT)],
+    "PHI MINUS": [(1273/IMAGE_WIDTH),(674/IMAGE_HEIGHT)],
+    "OMEGA THREE": [(1161/IMAGE_WIDTH),(835/IMAGE_HEIGHT)],
+    "OMEGA TWO": [(963/IMAGE_WIDTH),(834/IMAGE_HEIGHT)],
+    "PHI PLUS": [(848/IMAGE_WIDTH),(671/IMAGE_HEIGHT)],
+    "PSI PLUS": [(845/IMAGE_WIDTH),(436/IMAGE_HEIGHT)],
+    "quantumCompScale": [(97/IMAGE_WIDTH),(103/IMAGE_HEIGHT)],
 };
