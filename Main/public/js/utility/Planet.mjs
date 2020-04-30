@@ -13,7 +13,7 @@ class Planet {
     }
 
     set_transitions(h, x, cnot, color=null) {
-        var transitions = new Map(); //EngineCard -> (Function(EngineCard) -> Planet)
+        var transitions = new Map(); //Key: EngineCard, Value: (EngineCard -> Planet)
         transitions.set(EngineCard.H, h);
         transitions.set(EngineCard.X, x);
         transitions.set(EngineCard.CNOT, cnot);
@@ -86,4 +86,34 @@ OMEGA2.set_transitions(x => PHI_PLUS, x => OMEGA3, x => OMEGA3, Color.Red);
 OMEGA3.set_transitions(x => PSI_PLUS, x => OMEGA1, x => null, Color.Blue);
 OMEGA3.set_transitions(x => PHI_MINUS, x => OMEGA2, x => OMEGA2, Color.Red);
 
+export function transition(player_color, blue_planet, red_planet, engine_card) {
+    if (engine_card === EngineCard.SWAP || engine_card === EngineCard.PROBE) {
+        throw new Error("Handle SWAP and PROBE on your own; they aren't worth my time and energy !");
+    }
+
+    // For now, the comment "CNOT: flip your ship only if the other ship is on CENTARIOUS ONE" was ignored
+    if (player_color === Color.Blue) {
+        var destination_function = blue.get_transition(engine_card, player_color);
+        return destination_function(red_planet);
+    } else {
+        var destination_function = red.get_transition(engine_card, player_color);
+        return destination_function(blue_planet);
+    }
+}
+
+
 export const CLOCKWISE_TABLE = [OMEGA0, OMEGA1, PSI_MINUS, PHI_MINUS, OMEGA3, OMEGA2, PHI_PLUS, PSI_PLUS];
+export const PLANET_FROM_NAME = Object.freeze({
+    'ONE': ONE,
+    'ZERO': ZERO,
+    'PLUS': PLUS,
+    'MINUS': MINUS,
+    'PSI PLUS': PSI_PLUS,
+    'PSI MINUS': PSI_MINUS,
+    'PHI PLUS': PHI_PLUS,
+    'PHI MINUS': PHI_MINUS,
+    'OMEGA ZERO': OMEGA0,
+    'OMEGA ONE': OMEGA1,
+    'OMEGA TWO': OMEGA2,
+    'OMEGA THREE': OMEGA3
+});

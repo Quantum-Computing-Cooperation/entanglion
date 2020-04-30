@@ -1,7 +1,7 @@
-import {EngineControl, EngineStack} from './Engine.mjs';
-import {EventStack, Event} from './Events.mjs';
-import {DETECTION_MAP, Color, Component, centarious_roll, entanglion_roll, Action, MAX_DETECTION_RATE, ENGINE_DECK_INIT_SIZE} from './Util.mjs';
-import {ONE, ZERO, PSI_PLUS, PSI_MINUS, PHI_PLUS, PHI_MINUS, OMEGA0, OMEGA1, OMEGA2, OMEGA3, CLOCKWISE_TABLE} from './Planet.mjs';
+import {EngineControl, EngineStack} from './public/js/utility/Engine.mjs';
+import {EventStack, Event} from './public/js/utility/Events.mjs';
+import {DETECTION_MAP, Color, Component, centarious_roll, entanglion_roll, Action, MAX_DETECTION_RATE, ENGINE_DECK_INIT_SIZE} from './public/js/utility/Util.mjs';
+import {ONE, ZERO, CLOCKWISE_TABLE, transition} from './public/js/utility/Planet.mjs';
 
 var express = require('express');
 var app = express();
@@ -32,7 +32,8 @@ var game = {
     curr_player: null,
     engine_stack: new EngineStack(),
     event_stack: new EventStack(),
-    component_map: new Map(),
+    component_map: [], // Components arranged according to the CLOCKWISE_TABLE of planets
+    components_left: 8,
     ground_defenses: true,
     orbital_defenses: true,
     mechanic_deck: []
@@ -43,7 +44,7 @@ function send_locations() {
 }
 
 function send_components() {
-    io.emit('components', JSON.stringify(Array.from(game.component_map.entries())), game.blue_player.components, game.red_player.components);
+    io.emit('components', game.component_map, game.blue_player.components, game.red_player.components);
 }
 
 function send_curr_player() {
@@ -54,8 +55,12 @@ function send_engine_decks() {
     io.emit('engine_decks', game.blue_player.engine_deck, game.red_player.engine_deck);
 }
 
+function send_engine_control() {
+    io.emit('engine_control', game.engine_control.get());
+}
+
 function won() {
-    return game.component_map.size === 0;
+    return game.components_left === 0;
 }
 
 function game_over() {
@@ -64,11 +69,14 @@ function game_over() {
 
 function change_player() {
     game.curr_player = game.curr_player === Color.Blue ? Color.Red : Color.Blue;
-    send_curr_player();
 }
 
-function get_curr_player() {
+function curr_player() {
     return game.curr_player === Color.Blue ? game.blue_player : game.red_player;
+}
+
+function get_other_player() {
+    return game.curr_player === Color.Blue ? game.red_player : game.blue_player;
 }
 
 function set_detection_rate(new_rate) {
@@ -103,18 +111,30 @@ function set_locations(one, two) {
 }
 
 function distribute_components() {
-    var shuffled = [];
-    for(var comp in Component)
-      shuffled.push(comp);
-    game.component_map.set(PSI_PLUS, shuffled[0]);
-    game.component_map.set(PSI_MINUS, shuffled[1]);
-    game.component_map.set(PHI_PLUS, shuffled[2]);
-    game.component_map.set(PHI_MINUS, shuffled[3]);
-    game.component_map.set(OMEGA0, shuffled[4]);
-    game.component_map.set(OMEGA1, shuffled[5]);
-    game.component_map.set(OMEGA2, shuffled[6]);
-    game.component_map.set(OMEGA3, shuffled[7]);
+    function shuffle(array) {
+        var ctr = array.length, temp, index;
+      
+      // While there are elements in the array
+        while (ctr > 0) {
+      // Pick a random index
+            index = Math.floor(Math.random() * ctr);
+      // Decrease ctr by 1
+            ctr--;
+      // And swap the last element with it
+            temp = array[ctr];
+            array[ctr] = array[index];
+            array[index] = temp;
+        }
 
+        return array;
+    }
+
+    for(var comp in Component)
+      game.component_map.push(comp);
+
+
+    shuffle(game.component_map);
+    
     send_components();
 }
 
@@ -160,14 +180,58 @@ function start() {
     determine_first_player();
     determine_init_locations();
     draw_engine_cards();
+    set_detection_rate(game.detection_rate);
 }
 
-function navigate(arg) {
-  return;
+function navigate(engine_card) {
+    if (engine_card === EngineCard.SWAP) {
+        if (curr_player().planet === OMGEGA0) {
+            set_locations(OMEGA3, OMEGA3);
+        } else if (curr_player().planet === OMEGA3) {
+            set_locations(OMEGA0, OMEGA0);
+        } else {
+            set_locations(game.red_player.planet, game.blue_player.planet);
+        }
+    } else {
+        var dest = transition(game.curr_player, game.blue_player.planet, game.red_player.planet, engine_card);
+        if (dest.galaxy === Galaxy.Entanglion) {
+            set_locations(dest, dest);
+        } else {
+            if (game.curr_player === Color.BLUE) {
+                set_locations(dest, game.red_player.planet);
+            } else {
+                set_locations(game.blue_player.planet, dest);
+            }
+        }
+    }
+
+    if (game.blue_player.planet.galaxy === Galaxy.Entanglion) {
+        if (game.orbital_defenses) {
+            orbital_defense(); // TODO
+            // Detection rate may have increased if an event was triggered abvoe
+            if (game_over()) return;
+        } else {
+            game.orbital_defenses = true;
+        }
+    }
+
+    game.engine_control.push(engine_card);
+    if (game.engine_control.full()) {
+        game.engine_control.reset();
+        new_event(); // TODO
+    }
+
+    send_engine_control();
+
+    // Detection rate may have increased if an event was triggered above
+    if (game_over()) return;
+
+    // If we are not in the middle of a Mechanic event
+    if (game.mechanic_deck.length === 0) exchange(engine_card);
 }
 
 function exchange(card) {
-    var curr = get_curr_player();
+    var curr = curr_player();
     curr.splice(curr.indexOf(card));
     var drawn = draw_card();
     curr.engine_deck.push(drawn);
@@ -185,10 +249,10 @@ function retrieve() {
         game.ground_defenses = true;
     }
 
-    var comp = game.component_map[get_curr_player().planet];
-    game.component_map.remove(get_curr_player().planet);
-    get_curr_player().components.push(comp);
-
+    var comp_index = CLOCKWISE_TABLE.indexOf(curr_player().planet);
+    var comp = game.component_map[comp_index];
+    game.component_map[comp_index] = null;
+    curr_player().components.push(comp);
     send_components();
 }
 
@@ -198,14 +262,18 @@ function event(ev) {
             if (game.blue_player.components.length === 0 && game.red_player.components.length === 0) {
                 return;
             }
+
+            curr_player().emit('ask_bennet', get_other_player().components.length !== 0);
             // TODO
+
         case Event.Heisenberg:
             var roll = entanglion_roll();
             var planet = CLOCKWISE_TABLE[roll - 1];
             set_locations(planet, planet);
             break;
         case Event.Tunnel:
-            // TODO
+            change_player();
+            //TODO
         case Event.Mechanic:
             for (var i = 0; i < 3; ++i) {
                 game.mechanic_deck.push(draw_card());
@@ -213,7 +281,6 @@ function event(ev) {
                     return;
                 }
             }
-
             change_player();
             io.emit('mechanic_deck', game.mechanic_deck);
             break;
@@ -230,7 +297,7 @@ function event(ev) {
 
             var unoccupied_planets = [];
             for (var i = 0; i < 8; ++i) {
-                if (!game.component_map.has(CLOCKWISE_TABLE[i])) {
+                if (game.component_map[i] != null) {
                     unoccupied_planets.push(CLOCKWISE_TABLE[i]);
                 }
             }
@@ -238,14 +305,13 @@ function event(ev) {
             var index = entanglion_roll % unoccupied_planets.length;
             var planet = unoccupied_planets[index];
             var comp = curr_player().components[Math.floor(Math.random() * curr_player().components.length)];
-            game.component_map.set(planet, comp);
+            game.component_map[index] = comp;
             send_components();
             break;
         case Event.Collapse:
             set_detection_rate(Math.max(game.detection_rate - 2, 1))
     } 
 }
-
 
 var nb_players = 0;
 
@@ -278,6 +344,7 @@ io.on('connection', function(socket) {
         }
 
         change_player();
+        send_curr_player();
     });
 
     socket.on('mechanic', function(cont, card) {
@@ -292,6 +359,7 @@ io.on('connection', function(socket) {
                 io.emit('mechanic_done');
             } else {
                 change_player();
+                send_curr_player();
             }
 
         } else {
@@ -300,14 +368,26 @@ io.on('connection', function(socket) {
         }
     });
 
+    socket.on('tunnel', function(orbital) {
+        if (oribtal) {
+            game.orbital_defenses = false;
+        } else {
+            game.ground_defenses = false;
+        }
+        //TODO
+    });
+
     socket.on('disconnect', function () {
       nb_players--;
+      throw new Error("A player disconnected, game over"); // Could be improved to let the player rejoin
     });
 });
 
 server.listen(6969, function(){
     console.log('listening');
 });
+
+
 
 /*
 socket.emit('message', "this is a test"); //sending to sender-client only

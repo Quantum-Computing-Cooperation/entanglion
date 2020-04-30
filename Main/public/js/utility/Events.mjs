@@ -1,17 +1,17 @@
 export const Event = Object.freeze({
-    Bennet: 1,
-    Heisenberg: 2,
-    Tunnel: 3,
-    Mechanic: 4,
+    'Bennet': 1,
+    'Heisenberg': 2,
+    'Tunnel': 3,
+    'Mechanic': 4,
 
-    Error: 5,
-    Schrodinger: 6,
-    Spooky: 7,
-    Collapse: 8,
+    'Error': 5,
+    'Schrodinger': 6,
+    'Spooky': 7,
+    'Collapse': 8,
 
-    Shuffle: 9,
+    'Shuffle': 9,
 
-    can_save_for_later: {
+    'can_save_for_later': {
         1: true,
         2: true,
         3: true,
