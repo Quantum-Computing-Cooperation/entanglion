@@ -8,9 +8,13 @@ public class GameManager : NetworkBehaviour
     public UIManager uiManager;
     [HideInInspector]
     public int nRolls = 0;
+    [HideInInspector]
     public int myRoll;
+    [HideInInspector]
     public int hisRoll;
+    [HideInInspector]
     public string gameState = "Initialize {}";
+    [HideInInspector]
     public bool isMyTurn = false;
 
 

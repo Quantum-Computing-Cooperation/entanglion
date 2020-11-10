@@ -1,12 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using Mirror;
 using UnityEngine.UI;
 
 
+
+
 public class PlayerManager : NetworkBehaviour
 {
+
+    public class SyncListDice : SyncList<GameObject>{}
 
     //other managers
     public UIManager uiManager;
@@ -21,7 +26,7 @@ public class PlayerManager : NetworkBehaviour
 
     //Gameobject References
     GameObject dice;
-    List<GameObject> dieReferences = new List<GameObject>();
+    public SyncListDice dieReferences = new SyncListDice();
 
     //zones
     public GameObject player1Area;
@@ -47,6 +52,7 @@ public class PlayerManager : NetworkBehaviour
         uiManager = GameObject.Find("UIManager").GetComponent<UIManager>();
         rollButton = GameObject.Find("RollButton");
         startGameButton = GameObject.Find("StartGameButton");
+        startGameButton.SetActive(true);
         rollButton.GetComponent<StartRoll>().wasClicked = false;
         gameManager.gameState = "Initialize {}";
 }
@@ -54,7 +60,6 @@ public class PlayerManager : NetworkBehaviour
     [Server]
     public override void OnStartServer()
     {
-        startGameButton.SetActive(true);
         cards.Add(card1);
         cards.Add(card2);
     }
@@ -74,6 +79,7 @@ public class PlayerManager : NetworkBehaviour
         GameObject dice = Instantiate(die[rand], new Vector2(0, 0), Quaternion.identity);
         NetworkServer.Spawn(dice, connectionToClient);
         this.dieReferences.Add(dice);
+        Debug.Log("die references: " + dieReferences.Count);
         RpcShowDie(dice, rand);
         RpcGMChangeState("Compile {}");
 
@@ -81,7 +87,7 @@ public class PlayerManager : NetworkBehaviour
         {
             RpcShowRollResults();
             rollButton.GetComponent<StartRoll>().wasClicked = false;
-            CmdDestroyDie();
+            //CmdDestroyDie();
             Debug.Log("Tie");
         }
         if(gameManager.gameState == "Compile {Higher}")
@@ -159,91 +165,18 @@ public class PlayerManager : NetworkBehaviour
 
     }
 
+
     [Command]
     public void CmdDestroyDie()
     {
-        Debug.Log("Destroying");
-        GameObject dice;
-        dice = GameObject.Find("Oct1");
-        if (dice != null)
-        {
-            NetworkServer.Destroy(dice);
-        }
-        dice = GameObject.Find("Oct2");
-        if (dice != null)
-        {
-            NetworkServer.Destroy(dice);
-        }
-        dice = GameObject.Find("Oct3");
-        if (dice != null)
-        {
-            NetworkServer.Destroy(dice);
-        }
-        dice = GameObject.Find("Oct4");
-        if (dice != null)
-        {
-            NetworkServer.Destroy(dice);
-        }
-        dice = GameObject.Find("Oct5");
-        if (dice != null)
-        {
-            NetworkServer.Destroy(dice);
-        }
-        dice = GameObject.Find("Oct6");
-        if (dice != null)
-        {
-            NetworkServer.Destroy(dice);
-        }
-        dice = GameObject.Find("Oct7");
-        if (dice != null)
-        {
-            NetworkServer.Destroy(dice);
-        }
-        dice = GameObject.Find("Oct8");
-        if (dice != null)
-        {
-            NetworkServer.Destroy(dice);
-        }
-        dice = GameObject.Find("Oct1(1)");
-        if (dice != null)
-        {
-            NetworkServer.Destroy(dice);
-        }
-        dice = GameObject.Find("Oct2(1)");
-        if (dice != null)
-        {
-            NetworkServer.Destroy(dice);
-        }
-        dice = GameObject.Find("Oct3(1)");
-        if (dice != null)
-        {
-            NetworkServer.Destroy(dice);
-        }
-        dice = GameObject.Find("Oct4(1)");
-        if (dice != null)
-        {
-            NetworkServer.Destroy(dice);
-        }
-        dice = GameObject.Find("Oct5(1)");
-        if (dice != null)
-        {
-            NetworkServer.Destroy(dice);
-        }
-        dice = GameObject.Find("Oct6(1)");
-        if (dice != null)
-        {
-            NetworkServer.Destroy(dice);
-        }
-        dice = GameObject.Find("Oct7(1)");
-        if (dice != null)
-        {
-            NetworkServer.Destroy(dice);
-        }
-        dice = GameObject.Find("Oct8(1)");
-        if (dice != null)
-        {
-            NetworkServer.Destroy(dice);
-        }
+        //NetworkServer.Destroy(dieReferences[0]);
+        //NetworkServer.Destroy(dieReferences[1]);
+
+        var children = new List<GameObject>();
+        foreach (Transform child in dieArea.transform) children.Add(child.gameObject);
+        foreach (Transform child in otherDieArea.transform) children.Add(child.gameObject);
+        Debug.Log("found: " + children.Count);
+        children.ForEach(child => NetworkServer.Destroy(child));
     }
 
 }

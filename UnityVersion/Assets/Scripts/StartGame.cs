@@ -11,10 +11,10 @@ public class StartGame : MonoBehaviour
     {
         NetworkIdentity networkIdentity = NetworkClient.connection.identity;
         playerManager = networkIdentity.GetComponent<PlayerManager>();
-        if (playerManager.gameManager.isMyTurn == true)
-        {
-            playerManager.CmdDestroyDie();
-        }
+        //if (playerManager.gameManager.isMyTurn == true)
+        //{
+        playerManager.CmdDestroyDie();
+        //}
         
     }
 
