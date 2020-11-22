@@ -169,14 +169,31 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdDestroyDie()
     {
-        //NetworkServer.Destroy(dieReferences[0]);
-        //NetworkServer.Destroy(dieReferences[1]);
-
         var children = new List<GameObject>();
         foreach (Transform child in dieArea.transform) children.Add(child.gameObject);
         foreach (Transform child in otherDieArea.transform) children.Add(child.gameObject);
         Debug.Log("found: " + children.Count);
         children.ForEach(child => NetworkServer.Destroy(child));
+    }
+    [ClientRpc]
+    void RpcDisplayQc(string[] qcLocations)
+    {
+        uiManager.displayQc(qcLocations);
+    }
+    [Command]
+    public void CmdSetupGame()
+    {
+        //Place the Quantum Components
+        gameManager.ShuffleQcPlanets();
+        Debug.Log(gameManager.qcPlanets);
+        RpcDisplayQc(gameManager.qcPlanets);
+
+        //Shuffle the Engine Card Stack
+        //Prepare the Quantum Event Deck
+        //Set The initial detection Rate
+        //Determine the first player
+        //Determine The initial ship locations
+        //Draw Engine Cards
     }
 
 }

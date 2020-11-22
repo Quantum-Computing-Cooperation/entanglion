@@ -9,9 +9,9 @@ public class QuantumComponent : MonoBehaviour
     private readonly float dy = 540;
     private void Update()
     {
-        PlaceShip(planet);
+        PlaceComponent(planet);
     }
-    void PlaceShip(string planet)
+    void PlaceComponent(string planet)
     {
         switch (planet)
         {

@@ -1,10 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
 public class GameManager : NetworkBehaviour
 {
+    public string[] qcPlanets = new string[]{ "PSI_PLUS", "PSI_MINUS", "PHI_PLUS", "PHI_MINUS", "OMEGA_ONE",  "OMEGA_TWO", "OMEGA_THREE",  "OMEGA_ZERO" };
     public UIManager uiManager;
     [HideInInspector]
     public int nRolls = 0;
@@ -17,7 +19,17 @@ public class GameManager : NetworkBehaviour
     [HideInInspector]
     public bool isMyTurn = false;
 
-
+    public void ShuffleQcPlanets()
+    {
+        System.Random random = new System.Random();
+        for (int i = QcPlanets.Length - 1; i > 0; i--)
+        {
+            int randomIndex = random.Next(0, i + 1);
+            string temp = QcPlanets[i];
+            QcPlanets[i] = QcPlanets[randomIndex];
+            QcPlanets[randomIndex] = temp;
+        }
+    }
     public void ChangeGameState(string stateRequest)
     {
         if(stateRequest == "Initialize {}")
