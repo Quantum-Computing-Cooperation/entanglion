@@ -13,7 +13,7 @@ public class StartRoll : NetworkBehaviour
     {
         if (!wasClicked)
         {
-            //wasClicked = true;
+            wasClicked = true;
             NetworkIdentity networkIdentity = NetworkClient.connection.identity;
             playerManager = networkIdentity.GetComponent<PlayerManager>();
             playerManager.CmdRollDie();

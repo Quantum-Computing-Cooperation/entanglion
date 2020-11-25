@@ -23,6 +23,7 @@ public class PlayerManager : NetworkBehaviour
     public GameObject card1;
     public GameObject card2;
     List<GameObject> cards = new List<GameObject>();
+    public GameObject detectionRateToken;
 
 
     //Gameobject References
@@ -55,8 +56,8 @@ public class PlayerManager : NetworkBehaviour
         uiManager = GameObject.Find("UIManager").GetComponent<UIManager>();
         rollButton = GameObject.Find("RollButton");
         startGameButton = GameObject.Find("StartGameButton");
-        startGameButton.SetActive(true);
-        rollButton.GetComponent<StartRoll>().wasClicked = false;
+        detectionRateToken = GameObject.Find("Detection_Rate_Token");
+     
         gameManager.gameState = "Initialize {}";
 }
 
@@ -97,14 +98,14 @@ public class PlayerManager : NetworkBehaviour
         if(gameManager.gameState == "Compile {Higher}")
         {
             RpcShowRollResults();
-            RpcHideRollAndShowStart();
+            //RpcHideRollAndShowStart();
             Debug.Log("HIGHER");
 
         }
         if(gameManager.gameState == "Compile {Lower}")
         {
             RpcShowRollResults();
-            RpcHideRollAndShowStart();
+            //RpcHideRollAndShowStart();
             Debug.Log("lower");
         }
     }
@@ -115,12 +116,6 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     void CmdPlayCard(GameObject card) => RpcShowCard(card, "Played");
 
-    [ClientRpc]
-    void RpcHideRollAndShowStart()
-    {
-        rollButton.SetActive(false);
-        startGameButton.SetActive(true);
-    }
     [ClientRpc]
     void RpcShowCard(GameObject card, string type)
     {
@@ -192,24 +187,27 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdSetupGame()
     {
-        //for(int i =0; i < components.Length; i++)
-        {
-       //     Debug.Log(i+" :"+components[i] == null);
-            //GameObject component_init = Instantiate(components[i], new Vector2(0, 0), Quaternion.identity);
-            //componentsReferences[i] = component_init;
-            //NetworkServer.Spawn(component_init, connectionToClient);
-        }
         //Place the Quantum Components
         gameManager.ShuffleQcPlanets();
         Debug.Log(gameManager.qcPlanets);
         RpcDisplayQc(gameManager.qcPlanets);
-
-        //Shuffle the Engine Card Stack
-        //Prepare the Quantum Event Deck
         //Set The initial detection Rate
+        RpcChangeDetectionRate(0);
+        //Shuffle the Engine Card Stack
+
+        //Prepare the Quantum Event Deck
+
         //Determine the first player
+
         //Determine The initial ship locations
+
         //Draw Engine Cards
+    }
+
+    [ClientRpc]
+    void RpcChangeDetectionRate(int detectionRate)
+    {
+        detectionRateToken.GetComponent<DetectionDisplay>().rate = detectionRate;
     }
 
 }
