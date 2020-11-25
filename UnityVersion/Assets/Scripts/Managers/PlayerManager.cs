@@ -19,6 +19,7 @@ public class PlayerManager : NetworkBehaviour
 
     //all cards gameobjects
     public GameObject[] die = new GameObject[8];
+    public GameObject Quantumcomponents;
     public GameObject card1;
     public GameObject card2;
     List<GameObject> cards = new List<GameObject>();
@@ -43,6 +44,8 @@ public class PlayerManager : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
+        Quantumcomponents = GameObject.Find("Quantum_Components");
+        foreach (Transform child in Quantumcomponents.transform) child.gameObject.SetActive(false);
         player1Area = GameObject.Find("Player1Area");
         player2Area = GameObject.Find("Player2Area");
         dropZone = GameObject.Find("DropZone");
@@ -75,6 +78,7 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdRollDie()
     {
+        Debug.Log("DIE:" +die[0]);
         int rand = Random.Range(0, die.Length);
         GameObject dice = Instantiate(die[rand], new Vector2(0, 0), Quaternion.identity);
         NetworkServer.Spawn(dice, connectionToClient);
@@ -172,17 +176,29 @@ public class PlayerManager : NetworkBehaviour
         var children = new List<GameObject>();
         foreach (Transform child in dieArea.transform) children.Add(child.gameObject);
         foreach (Transform child in otherDieArea.transform) children.Add(child.gameObject);
-        Debug.Log("found: " + children.Count);
         children.ForEach(child => NetworkServer.Destroy(child));
     }
     [ClientRpc]
     void RpcDisplayQc(string[] qcLocations)
     {
-        uiManager.displayQc(qcLocations);
+        int i = 0;
+        foreach (Transform child in Quantumcomponents.transform)
+        {
+            child.gameObject.SetActive(true);
+            child.gameObject.GetComponent<QuantumComponent>().planet = qcLocations[i];
+            i++;
+        }
     }
     [Command]
     public void CmdSetupGame()
     {
+        //for(int i =0; i < components.Length; i++)
+        {
+       //     Debug.Log(i+" :"+components[i] == null);
+            //GameObject component_init = Instantiate(components[i], new Vector2(0, 0), Quaternion.identity);
+            //componentsReferences[i] = component_init;
+            //NetworkServer.Spawn(component_init, connectionToClient);
+        }
         //Place the Quantum Components
         gameManager.ShuffleQcPlanets();
         Debug.Log(gameManager.qcPlanets);

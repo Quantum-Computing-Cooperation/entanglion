@@ -92,11 +92,30 @@ MonoBehaviour:
   - {fileID: 7963576439076750943, guid: d8468cd7cd0aeb04fb59bb214704f005, type: 3}
   - {fileID: 6400473857051038587, guid: bb13975067d33e6488a716138254428a, type: 3}
   - {fileID: 2743944415259343489, guid: 68d8f6da80f8b434787678642c208748, type: 3}
+  components:
+  - {fileID: 6364568271250057572, guid: e390c58eab964ea42afd13f4a9e97a9b, type: 3}
+  - {fileID: 8943217187913792010, guid: 237af111372e2be46917d54ff70c1e35, type: 3}
+  - {fileID: 8058810366167600186, guid: 6280c0984e865b4409b4be8e07f6b5ac, type: 3}
+  - {fileID: 2818336260635017010, guid: e2e4123cf6cfe0f40bbb2163207df9f8, type: 3}
+  - {fileID: 7298311489058780100, guid: b816eb5d29be03b4e92b138c4ccc6b29, type: 3}
+  - {fileID: 5407849276229066138, guid: dd30c69281eb77647821ebafeb28bf2f, type: 3}
+  - {fileID: 2459348222233890196, guid: 35e8f2c8efb9660488cac4f1ceb638c9, type: 3}
+  - {fileID: 8276345376103643585, guid: 432c08df86ceda14986817d37372ab4f, type: 3}
+  componentsReferences:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   card1: {fileID: 3535056137129323157, guid: 51d7505d437f85440bc079648cb11855, type: 3}
   card2: {fileID: 8887289822825731828, guid: aa2b6b50cd01c64419935844ea97f353, type: 3}
-  roller: {fileID: 2887669925443107145, guid: 32e4f29e9c5d6004c9d4dba452a0c37b, type: 3}
   player1Area: {fileID: 0}
   player2Area: {fileID: 0}
   dropZone: {fileID: 0}
   dieArea: {fileID: 0}
   otherDieArea: {fileID: 0}
+  rollButton: {fileID: 0}
+  startGameButton: {fileID: 0}

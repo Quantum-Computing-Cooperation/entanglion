@@ -22,12 +22,12 @@ public class GameManager : NetworkBehaviour
     public void ShuffleQcPlanets()
     {
         System.Random random = new System.Random();
-        for (int i = QcPlanets.Length - 1; i > 0; i--)
+        for (int i = qcPlanets.Length - 1; i > 0; i--)
         {
             int randomIndex = random.Next(0, i + 1);
-            string temp = QcPlanets[i];
-            QcPlanets[i] = QcPlanets[randomIndex];
-            QcPlanets[randomIndex] = temp;
+            string temp = qcPlanets[i];
+            qcPlanets[i] = qcPlanets[randomIndex];
+            qcPlanets[randomIndex] = temp;
         }
     }
     public void ChangeGameState(string stateRequest)

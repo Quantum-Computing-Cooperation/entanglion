@@ -13,7 +13,7 @@ public class StartGame : MonoBehaviour
         playerManager = networkIdentity.GetComponent<PlayerManager>();
         //if (playerManager.gameManager.isMyTurn == true)
         //{
-        playerManager.CmdDestroyDie();
+        playerManager.CmdSetupGame();
         //}
         
     }

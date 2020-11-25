@@ -6,12 +6,23 @@ using UnityEngine.UI;
 
 public class UIManager : NetworkBehaviour
 {
-
     public GameManager gameManager;
     public GameObject rollText;
     public GameObject rollButton;
-    public GameObject[] components;
     // Start is called before the first frame update
+
+    enum QuantumOrder : ushort
+    {
+        ControlInfrastructure = 0,
+        DillutionRefrigerator = 1,
+        MagneticShielding = 2,
+        PhysicalQubits = 3,
+        QuantumErrorCorrection = 4,
+        QuantumGates = 5,
+        QuantumProgramming = 6,
+        QubitInterconnect = 7,
+        COMPONENTS_LENGTH = 8
+    }
     private void Start()
     {
         gameManager = GameObject.Find("UIManager").GetComponent<GameManager>();
