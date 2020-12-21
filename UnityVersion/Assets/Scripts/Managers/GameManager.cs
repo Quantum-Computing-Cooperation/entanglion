@@ -9,6 +9,8 @@ public class GameManager : NetworkBehaviour
     public string[] qcPlanets = new string[]{ "PSI_PLUS", "PSI_MINUS", "PHI_PLUS", "PHI_MINUS", "OMEGA_ONE",  "OMEGA_TWO", "OMEGA_THREE",  "OMEGA_ZERO" };
     public UIManager uiManager;
     [HideInInspector]
+    public int nPlanetRolls = 0;
+    [HideInInspector]
     public int nRolls = 0;
     [HideInInspector]
     public int myRoll;
@@ -18,6 +20,11 @@ public class GameManager : NetworkBehaviour
     public string gameState = "Initialize {}";
     [HideInInspector]
     public bool isMyTurn = false;
+
+    public void changeTurn()
+    {
+        isMyTurn = !isMyTurn;
+    }
 
     public void ShuffleQcPlanets()
     {
@@ -59,7 +66,11 @@ public class GameManager : NetworkBehaviour
             }
         }else if (stateRequest == "Execute {}")
         {
-            gameState = "Execute {}";
+            if (nPlanetRolls == 1)
+            {
+                stateRequest = "Started {}";
+            }
+            nPlanetRolls++;
         }
     }
 

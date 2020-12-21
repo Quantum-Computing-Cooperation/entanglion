@@ -19,16 +19,21 @@ public class PlayerManager : NetworkBehaviour
 
     //all cards gameobjects
     public GameObject[] die = new GameObject[8];
+    public GameObject[] CentariousDie = new GameObject[2];
     public GameObject Quantumcomponents;
     public GameObject card1;
     public GameObject card2;
     List<GameObject> cards = new List<GameObject>();
     public GameObject detectionRateToken;
-
+    public GameObject blueShip;
+    public GameObject redShip;
+    public GameObject blueShipInstance;
+    public GameObject redShipInstance;
 
     //Gameobject References
     GameObject dice;
     public SyncListDice dieReferences = new SyncListDice();
+    public GameObject engineDeck;
 
     //zones
     public GameObject player1Area;
@@ -36,10 +41,12 @@ public class PlayerManager : NetworkBehaviour
     public GameObject dropZone;
     public GameObject dieArea;
     public GameObject otherDieArea;
+    public GameObject planetRollArea;
 
     //Buttons
     public GameObject rollButton;
     public GameObject startGameButton;
+    public GameObject rollPlanet;
 
 
     public override void OnStartClient()
@@ -57,7 +64,9 @@ public class PlayerManager : NetworkBehaviour
         rollButton = GameObject.Find("RollButton");
         startGameButton = GameObject.Find("StartGameButton");
         detectionRateToken = GameObject.Find("Detection_Rate_Token");
-     
+        engineDeck = GameObject.Find("EngineDeck");
+        rollPlanet = GameObject.Find("RollPlanet");
+        planetRollArea = GameObject.Find("PlanetRollArea");
         gameManager.gameState = "Initialize {}";
 }
 
@@ -79,12 +88,10 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdRollDie()
     {
-        Debug.Log("DIE:" +die[0]);
         int rand = Random.Range(0, die.Length);
         GameObject dice = Instantiate(die[rand], new Vector2(0, 0), Quaternion.identity);
         NetworkServer.Spawn(dice, connectionToClient);
         this.dieReferences.Add(dice);
-        Debug.Log("die references: " + dieReferences.Count);
         RpcShowDie(dice, rand);
         RpcGMChangeState("Compile {}");
 
@@ -92,24 +99,52 @@ public class PlayerManager : NetworkBehaviour
         {
             RpcShowRollResults();
             rollButton.GetComponent<StartRoll>().wasClicked = false;
-            //CmdDestroyDie();
-            Debug.Log("Tie");
+            CmdDestroyDie();
         }
         if(gameManager.gameState == "Compile {Higher}")
         {
             RpcShowRollResults();
-            //RpcHideRollAndShowStart();
-            Debug.Log("HIGHER");
+            RPCTakeOtherTurn();
+            gameManager.isMyTurn = true;
 
         }
         if(gameManager.gameState == "Compile {Lower}")
         {
             RpcShowRollResults();
-            //RpcHideRollAndShowStart();
-            Debug.Log("lower");
+            RPCGiveOtherTurn();
+            gameManager.isMyTurn = false;
         }
     }
 
+    [Command]
+    public void CmdRollPlanet()
+    {
+        if (!gameManager.isMyTurn)
+        {
+            return;
+        }
+        int rand = Random.Range(0, CentariousDie.Length);
+        GameObject dice = Instantiate(CentariousDie[rand], new Vector2(0, 0), Quaternion.identity);
+        NetworkServer.Spawn(dice, connectionToClient);
+        dice.transform.SetParent(planetRollArea.transform, false);
+        RpcGMChangeState("Execute {}");
+        blueShipInstance = Instantiate(blueShip, new Vector2(0, 0), Quaternion.identity);
+        blueShipInstance.GetComponent<ShipPlacement>().planet = (rand == 0) ? "ZERO" : "ONE";
+        Debug.Log("reached here");
+        
+    }
+
+    [ClientRpc]
+    void RPCTakeOtherTurn()
+    {
+        gameManager.isMyTurn = false;
+    }
+
+    [ClientRpc]
+    void RPCGiveOtherTurn()
+    {
+        gameManager.isMyTurn = true;
+    }
 
     public void PlayCard(GameObject card) => CmdPlayCard(card);
 
@@ -151,6 +186,22 @@ public class PlayerManager : NetworkBehaviour
 
     }
 
+
+    [ClientRpc]
+    void RPCShowShip(GameObject dice, string planet)
+    {
+        if (hasAuthority)
+        {
+            dice.transform.SetParent(dieArea.transform, false);
+        }
+        else
+        {
+            dice.transform.SetParent(otherDieArea.transform, false);
+        }
+
+    }
+
+
     [ClientRpc]
     void RpcGMChangeState(string stateRequest)
     {
@@ -163,8 +214,6 @@ public class PlayerManager : NetworkBehaviour
         uiManager.UpdateRollText(gameManager.myRoll, gameManager.hisRoll);
 
     }
-
-
     [Command]
     public void CmdDestroyDie()
     {
@@ -173,6 +222,14 @@ public class PlayerManager : NetworkBehaviour
         foreach (Transform child in otherDieArea.transform) children.Add(child.gameObject);
         children.ForEach(child => NetworkServer.Destroy(child));
     }
+    [Command]
+    public void CmdDestroyPlanetDie()
+    {
+        var children = new List<GameObject>();
+        foreach (Transform child in planetRollArea.transform) children.Add(child.gameObject);
+        children.ForEach(child => NetworkServer.Destroy(child));
+    }
+
     [ClientRpc]
     void RpcDisplayQc(string[] qcLocations)
     {
@@ -188,20 +245,20 @@ public class PlayerManager : NetworkBehaviour
     public void CmdSetupGame()
     {
         //Place the Quantum Components
-        gameManager.ShuffleQcPlanets();
-        Debug.Log(gameManager.qcPlanets);
+        gameManager.ShuffleQcPlanets();;
         RpcDisplayQc(gameManager.qcPlanets);
         //Set The initial detection Rate
         RpcChangeDetectionRate(0);
         //Shuffle the Engine Card Stack
-
+        // NOTHING NEEDS TO BE DONE ALL DONE IN START FUNCTION OF OBJECT
         //Prepare the Quantum Event Deck
-
+        //TODO
         //Determine the first player
-
+        rollButton.GetComponent<StartRoll>().wasClicked = false;
         //Determine The initial ship locations
-
+        //NOT HERE
         //Draw Engine Cards
+        //NOT HERE
     }
 
     [ClientRpc]
@@ -209,5 +266,6 @@ public class PlayerManager : NetworkBehaviour
     {
         detectionRateToken.GetComponent<DetectionDisplay>().rate = detectionRate;
     }
+    
 
 }

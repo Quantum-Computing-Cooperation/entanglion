@@ -5,7 +5,7 @@ using Mirror;
 
 public class StartRoll : NetworkBehaviour
 {
-    public bool wasClicked = false;
+    public bool wasClicked = true;
     public PlayerManager playerManager;
 
 

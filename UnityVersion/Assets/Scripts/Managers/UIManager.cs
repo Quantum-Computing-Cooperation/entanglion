@@ -35,7 +35,7 @@ public class UIManager : NetworkBehaviour
         if (myRoll == hisRoll)
         {
             rollText.GetComponent<Text>().text = "YOU BOTH GOT THE SAME SCORE! PLEASE REROLL";
-            rollButton.GetComponent<StartRoll>().wasClicked = false;
+            rollButton.GetComponent<StartRoll>().wasClicked = false; // DUPLICATE in playerManager !!
         }  else if (myRoll > hisRoll)
         {
             rollText.GetComponent<Text>().text = "YOU GOT THE HIGHER ROLL WITH: " + (myRoll + 1) + ". YOU GO FIRST!";
