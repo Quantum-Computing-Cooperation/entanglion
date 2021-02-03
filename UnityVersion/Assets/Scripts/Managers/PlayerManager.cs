@@ -27,8 +27,6 @@ public class PlayerManager : NetworkBehaviour
     public GameObject detectionRateToken;
     public GameObject blueShip;
     public GameObject redShip;
-    public GameObject blueShipInstance;
-    public GameObject redShipInstance;
 
     //Gameobject References
     GameObject dice;
@@ -98,7 +96,7 @@ public class PlayerManager : NetworkBehaviour
         if (gameManager.gameState == "Compile {Draw}")
         {
             RpcShowRollResults();
-            rollButton.GetComponent<StartRoll>().wasClicked = false;
+            RpcReenableRolling();
             CmdDestroyDie();
         }
         if(gameManager.gameState == "Compile {Higher}")
@@ -106,6 +104,7 @@ public class PlayerManager : NetworkBehaviour
             RpcShowRollResults();
             RPCTakeOtherTurn();
             gameManager.isMyTurn = true;
+            Debug.Log(gameManager.isMyTurn);
 
         }
         if(gameManager.gameState == "Compile {Lower}")
@@ -113,25 +112,33 @@ public class PlayerManager : NetworkBehaviour
             RpcShowRollResults();
             RPCGiveOtherTurn();
             gameManager.isMyTurn = false;
+            Debug.Log(gameManager.isMyTurn);
         }
     }
-
+    [ClientRpc]
+    public void RpcReenableRolling()
+    {
+        rollButton.GetComponent<StartRoll>().wasClicked = false;
+    }
     [Command]
     public void CmdRollPlanet()
     {
-        if (!gameManager.isMyTurn)
-        {
-            return;
-        }
         int rand = Random.Range(0, CentariousDie.Length);
         GameObject dice = Instantiate(CentariousDie[rand], new Vector2(0, 0), Quaternion.identity);
         NetworkServer.Spawn(dice, connectionToClient);
-        dice.transform.SetParent(planetRollArea.transform, false);
+        RpcShowCentDie(dice, rand);
+        RPCShowShip((rand == 0)? "ZERO": "ONE");
         RpcGMChangeState("Execute {}");
-        blueShipInstance = Instantiate(blueShip, new Vector2(0, 0), Quaternion.identity);
-        blueShipInstance.GetComponent<ShipPlacement>().planet = (rand == 0) ? "ZERO" : "ONE";
-        Debug.Log("reached here");
-        
+    }
+
+    [ClientRpc]
+    void RpcShowCentDie(GameObject dice, int rand)
+    {
+        if (hasAuthority)
+        {
+            dice.transform.SetParent(planetRollArea.transform, false);
+        }
+
     }
 
     [ClientRpc]
@@ -188,15 +195,15 @@ public class PlayerManager : NetworkBehaviour
 
 
     [ClientRpc]
-    void RPCShowShip(GameObject dice, string planet)
+    void RPCShowShip(string planet)
     {
         if (hasAuthority)
         {
-            dice.transform.SetParent(dieArea.transform, false);
+            blueShip.GetComponent<ShipPlacement>().planet = planet;
         }
         else
         {
-            dice.transform.SetParent(otherDieArea.transform, false);
+            redShip.GetComponent<ShipPlacement>().planet = planet;
         }
 
     }

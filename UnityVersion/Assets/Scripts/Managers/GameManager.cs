@@ -20,6 +20,7 @@ public class GameManager : NetworkBehaviour
     public string gameState = "Initialize {}";
     [HideInInspector]
     public bool isMyTurn = false;
+    public string shipPlanet = "ZERO";
 
     public void changeTurn()
     {
@@ -46,6 +47,7 @@ public class GameManager : NetworkBehaviour
 
         }else if (stateRequest == "Compile {}")
         {
+            nPlanetRolls = 0;
             if(nRolls == 1)
             {
                 if (hisRoll == myRoll)
