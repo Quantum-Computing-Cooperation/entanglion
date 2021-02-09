@@ -73,6 +73,7 @@ public class PlayerManager : NetworkBehaviour
         rollPlanet = GameObject.Find("RollPlanet");
         planetRollArea = GameObject.Find("PlanetRollArea");
         gameManager.gameState = "Initialize {}";
+        mainCanvas = GameObject.Find("Main_Canvas");
     }
 
     [Server]
@@ -202,18 +203,20 @@ public class PlayerManager : NetworkBehaviour
     [ClientRpc]
     void RPCShowShip(string planet)
     {
-        Debug.Log("attempting to show ship");
+        //Debug.Log("attempting to show ship");
         if (hasAuthority)
         {
-            Debug.Log("changed blueship planet from " + blueShipInstance.GetComponent<ShipPlacement>().planet);
+            //Debug.Log("changed blueship planet from " + blueShipInstance.GetComponent<ShipPlacement>().planet);
+            blueShipInstance.transform.SetParent(mainCanvas.transform, false);
             blueShipInstance.GetComponent<ShipPlacement>().planet = planet;
-            Debug.Log("to" + blueShipInstance.GetComponent<ShipPlacement>().planet);
+            //Debug.Log("to" + blueShipInstance.GetComponent<ShipPlacement>().planet);
         }
         else
         {
-            Debug.Log("changed redship planet from " + redShipInstance.GetComponent<ShipPlacement>().planet);
+            //Debug.Log("changed redship planet from " + redShipInstance.GetComponent<ShipPlacement>().planet);
+            redShipInstance.transform.SetParent(mainCanvas.transform, false);
             redShipInstance.GetComponent<ShipPlacement>().planet = planet;
-            Debug.Log("to" + redShipInstance.GetComponent<ShipPlacement>().planet);
+            //Debug.Log("to" + redShipInstance.GetComponent<ShipPlacement>().planet);
         }
 
     }
