@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 1163528117712497958}
   - component: {fileID: 1163528117712497959}
   - component: {fileID: 1163528117712497957}
-  - component: {fileID: 7783727893164034642}
-  - component: {fileID: 3331664526870951451}
+  - component: {fileID: 1384375486436653443}
+  - component: {fileID: 3312016267085408403}
   m_Layer: 5
   m_Name: BlueShip
   m_TagString: Untagged
@@ -90,8 +90,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df44636a3c946a146b53a6237945cee2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  planet: 
---- !u!114 &7783727893164034642
+  planet: ONE
+--- !u!114 &1384375486436653443
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -107,7 +107,7 @@ MonoBehaviour:
   serverOnly: 0
   m_AssetId: 
   hasSpawned: 0
---- !u!114 &3331664526870951451
+--- !u!114 &3312016267085408403
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

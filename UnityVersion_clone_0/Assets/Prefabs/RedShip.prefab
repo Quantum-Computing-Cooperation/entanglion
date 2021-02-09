@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 6363754002591198350}
   - component: {fileID: 6363754002591198351}
   - component: {fileID: 6363754002591198349}
-  - component: {fileID: 3794153020069162126}
-  - component: {fileID: 875112231260552460}
+  - component: {fileID: 3132858782878040342}
+  - component: {fileID: 892739886089095961}
   m_Layer: 5
   m_Name: RedShip
   m_TagString: Untagged
@@ -28,7 +28,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6363754002591198385}
-  m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -90,8 +90,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df44636a3c946a146b53a6237945cee2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  planet: 
---- !u!114 &3794153020069162126
+  planet: ZERO
+--- !u!114 &3132858782878040342
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -107,7 +107,7 @@ MonoBehaviour:
   serverOnly: 0
   m_AssetId: 
   hasSpawned: 0
---- !u!114 &875112231260552460
+--- !u!114 &892739886089095961
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

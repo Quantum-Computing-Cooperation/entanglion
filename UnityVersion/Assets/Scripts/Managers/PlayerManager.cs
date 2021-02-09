@@ -27,6 +27,8 @@ public class PlayerManager : NetworkBehaviour
     public GameObject detectionRateToken;
     public GameObject blueShip;
     public GameObject redShip;
+    public GameObject blueShipInstance;
+    public GameObject redShipInstance;
 
     //Gameobject References
     GameObject dice;
@@ -40,13 +42,18 @@ public class PlayerManager : NetworkBehaviour
     public GameObject dieArea;
     public GameObject otherDieArea;
     public GameObject planetRollArea;
+    public GameObject mainCanvas;
 
     //Buttons
     public GameObject rollButton;
     public GameObject startGameButton;
     public GameObject rollPlanet;
 
-
+    private void Start()
+    {
+        blueShipInstance = Instantiate(blueShip, new Vector2(0, 0), Quaternion.identity);
+        redShipInstance = Instantiate(redShip, new Vector2(0, 0), Quaternion.identity);
+    }
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -66,7 +73,7 @@ public class PlayerManager : NetworkBehaviour
         rollPlanet = GameObject.Find("RollPlanet");
         planetRollArea = GameObject.Find("PlanetRollArea");
         gameManager.gameState = "Initialize {}";
-}
+    }
 
     [Server]
     public override void OnStartServer()
@@ -104,7 +111,6 @@ public class PlayerManager : NetworkBehaviour
             RpcShowRollResults();
             RPCTakeOtherTurn();
             gameManager.isMyTurn = true;
-            Debug.Log(gameManager.isMyTurn);
 
         }
         if(gameManager.gameState == "Compile {Lower}")
@@ -112,7 +118,6 @@ public class PlayerManager : NetworkBehaviour
             RpcShowRollResults();
             RPCGiveOtherTurn();
             gameManager.isMyTurn = false;
-            Debug.Log(gameManager.isMyTurn);
         }
     }
     [ClientRpc]
@@ -197,14 +202,18 @@ public class PlayerManager : NetworkBehaviour
     [ClientRpc]
     void RPCShowShip(string planet)
     {
+        Debug.Log("attempting to show ship");
         if (hasAuthority)
         {
-            Debug.Log(blueShip.GetComponent<ShipPlacement>().planet);
-            blueShip.GetComponent<ShipPlacement>().planet = planet;
+            Debug.Log("changed blueship planet from " + blueShipInstance.GetComponent<ShipPlacement>().planet);
+            blueShipInstance.GetComponent<ShipPlacement>().planet = planet;
+            Debug.Log("to" + blueShipInstance.GetComponent<ShipPlacement>().planet);
         }
         else
         {
-            redShip.GetComponent<ShipPlacement>().planet = planet;
+            Debug.Log("changed redship planet from " + redShipInstance.GetComponent<ShipPlacement>().planet);
+            redShipInstance.GetComponent<ShipPlacement>().planet = planet;
+            Debug.Log("to" + redShipInstance.GetComponent<ShipPlacement>().planet);
         }
 
     }
@@ -249,9 +258,12 @@ public class PlayerManager : NetworkBehaviour
             i++;
         }
     }
+
     [Command]
     public void CmdSetupGame()
     {
+        RpcInitializeShips();
+
         //Place the Quantum Components
         gameManager.ShuffleQcPlanets();;
         RpcDisplayQc(gameManager.qcPlanets);
@@ -267,6 +279,12 @@ public class PlayerManager : NetworkBehaviour
         //NOT HERE
         //Draw Engine Cards
         //NOT HERE
+    }
+
+    [ClientRpc]
+    void RpcInitializeShips()
+    {
+
     }
 
     [ClientRpc]
