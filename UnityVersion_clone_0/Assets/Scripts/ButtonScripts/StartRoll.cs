@@ -5,9 +5,12 @@ using Mirror;
 
 public class StartRoll : NetworkBehaviour
 {
-    public bool wasClicked = true;
+    public bool wasClicked;
     public PlayerManager playerManager;
-
+    private void Start()
+    {
+        wasClicked = true;
+    }
 
     public void OnRoll()
     {

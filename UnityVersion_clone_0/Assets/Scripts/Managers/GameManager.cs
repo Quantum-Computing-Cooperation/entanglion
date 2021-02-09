@@ -56,13 +56,13 @@ public class GameManager : NetworkBehaviour
                 }
                 else if(myRoll > hisRoll)
                 {
-                    gameState = "Compile {Higher}";
+                    gameState = "Compile {HostTurn}";
                     isMyTurn = true;
 
                 }
                 else
                 {
-                    gameState = "Compile {Lower}";
+                    gameState = "Compile {ClientTurn}";
                     isMyTurn = false;
                 }
             }

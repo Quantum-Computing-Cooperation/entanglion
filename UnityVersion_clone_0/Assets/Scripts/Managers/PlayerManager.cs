@@ -99,36 +99,69 @@ public class PlayerManager : NetworkBehaviour
         NetworkServer.Spawn(dice, connectionToClient);
         this.dieReferences.Add(dice);
         RpcShowDie(dice, rand);
-        RpcGMChangeState("Compile {}");
+        gameManager.ChangeGameState("Compile {}");
 
         if (gameManager.gameState == "Compile {Draw}")
         {
             RpcShowRollResults();
-            RpcReenableRolling();
+            RpcEnableRollButton();
             CmdDestroyDie();
         }
-        if(gameManager.gameState == "Compile {Higher}")
+        if(gameManager.gameState == "Compile {HostTurn}" || gameManager.gameState == "Compile {ClientTurn}")
         {
             RpcShowRollResults();
-            RPCTakeOtherTurn();
-            gameManager.isMyTurn = true;
-
-        }
-        if(gameManager.gameState == "Compile {Lower}")
-        {
-            RpcShowRollResults();
-            RPCGiveOtherTurn();
-            gameManager.isMyTurn = false;
+            RpcUpdateTurn();
+            Debug.Log(gameManager.isMyTurn);
         }
     }
+
+    [ClientRpc]
+    void RpcUpdateTurn()
+    {
+        Debug.Log(gameManager.gameState);
+        if(gameManager.gameState == "Compile {HostTurn}")
+        {
+            if (isClientOnly)
+            {
+                gameManager.isMyTurn = false;
+            }
+            else
+            {
+                gameManager.isMyTurn = true;
+            }
+        }
+        if(gameManager.gameState == "Compile {ClientTurn}")
+        {
+            if (isClientOnly)
+            {
+                gameManager.isMyTurn = true;
+            }
+            else
+            {
+                gameManager.isMyTurn = false;
+            }
+        }
+    }
+
+    [TargetRpc]
+    public void TargetGiveTurn(GameObject target)
+    {
+        gameManager.isMyTurn = true;
+    }
+
     [ClientRpc]
     public void RpcReenableRolling()
     {
         rollButton.GetComponent<StartRoll>().wasClicked = false;
     }
+
     [Command]
     public void CmdRollPlanet()
     {
+        if (!gameManager.isMyTurn)
+        {
+            return;
+        }
         int rand = Random.Range(0, CentariousDie.Length);
         GameObject dice = Instantiate(CentariousDie[rand], new Vector2(0, 0), Quaternion.identity);
         NetworkServer.Spawn(dice, connectionToClient);
@@ -145,18 +178,6 @@ public class PlayerManager : NetworkBehaviour
             dice.transform.SetParent(planetRollArea.transform, false);
         }
 
-    }
-
-    [ClientRpc]
-    void RPCTakeOtherTurn()
-    {
-        gameManager.isMyTurn = false;
-    }
-
-    [ClientRpc]
-    void RPCGiveOtherTurn()
-    {
-        gameManager.isMyTurn = true;
     }
 
     public void PlayCard(GameObject card) => CmdPlayCard(card);
@@ -203,30 +224,20 @@ public class PlayerManager : NetworkBehaviour
     [ClientRpc]
     void RPCShowShip(string planet)
     {
-        //Debug.Log("attempting to show ship");
         if (hasAuthority)
         {
-            //Debug.Log("changed blueship planet from " + blueShipInstance.GetComponent<ShipPlacement>().planet);
             blueShipInstance.transform.SetParent(mainCanvas.transform, false);
             blueShipInstance.GetComponent<ShipPlacement>().planet = planet;
-            //Debug.Log("to" + blueShipInstance.GetComponent<ShipPlacement>().planet);
         }
         else
         {
-            //Debug.Log("changed redship planet from " + redShipInstance.GetComponent<ShipPlacement>().planet);
             redShipInstance.transform.SetParent(mainCanvas.transform, false);
             redShipInstance.GetComponent<ShipPlacement>().planet = planet;
-            //Debug.Log("to" + redShipInstance.GetComponent<ShipPlacement>().planet);
         }
 
     }
 
 
-    [ClientRpc]
-    void RpcGMChangeState(string stateRequest)
-    {
-        gameManager.ChangeGameState(stateRequest);
-    }
 
     [ClientRpc]
     void RpcShowRollResults()
@@ -265,8 +276,7 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdSetupGame()
     {
-        RpcInitializeShips();
-
+        RpcDisableStartButton();
         //Place the Quantum Components
         gameManager.ShuffleQcPlanets();;
         RpcDisplayQc(gameManager.qcPlanets);
@@ -277,7 +287,7 @@ public class PlayerManager : NetworkBehaviour
         //Prepare the Quantum Event Deck
         //TODO
         //Determine the first player
-        rollButton.GetComponent<StartRoll>().wasClicked = false;
+        RpcEnableRollButton();
         //Determine The initial ship locations
         //NOT HERE
         //Draw Engine Cards
@@ -285,9 +295,15 @@ public class PlayerManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    void RpcInitializeShips()
+    void RpcDisableStartButton()
     {
+        startGameButton.GetComponent<StartGame>().wasClicked = true;
+    }
 
+    [ClientRpc]
+    void RpcEnableRollButton()
+    {
+        rollButton.GetComponent<StartRoll>().wasClicked = false;
     }
 
     [ClientRpc]
