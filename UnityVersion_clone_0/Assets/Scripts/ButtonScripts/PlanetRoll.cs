@@ -17,10 +17,15 @@ public class PlanetRoll : NetworkBehaviour
 
         if (!wasClicked)
         {
-            wasClicked = true;
+            
             NetworkIdentity networkIdentity = NetworkClient.connection.identity;
             playerManager = networkIdentity.GetComponent<PlayerManager>();
-            playerManager.CmdRollPlanet();
+            if (playerManager.gameManager.isMyTurn)
+            {
+                wasClicked = true;
+                playerManager.CmdRollPlanet();
+            }
+
         }
 
     }

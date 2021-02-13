@@ -99,55 +99,44 @@ public class PlayerManager : NetworkBehaviour
         NetworkServer.Spawn(dice, connectionToClient);
         this.dieReferences.Add(dice);
         RpcShowDie(dice, rand);
-        gameManager.ChangeGameState("Compile {}");
+        RpcChangeGameState("Compile {}");
 
+
+        StartCoroutine(WaitForCompile());
+    }
+
+    IEnumerator WaitForCompile()
+    {
+        //yield on a new YieldInstruction that waits for 1 seconds.
+        yield return new WaitForSeconds(1);
         if (gameManager.gameState == "Compile {Draw}")
         {
             RpcShowRollResults();
             RpcEnableRollButton();
-            CmdDestroyDie();
+
+            //The host needs to cmd destroy die
+            RpcDestroyDie();
+            RpcChangeGameState("Initialize {}");
         }
-        if(gameManager.gameState == "Compile {HostTurn}" || gameManager.gameState == "Compile {ClientTurn}")
+        if (gameManager.gameState == "Compile {Higher}" || gameManager.gameState == "Compile {Lower}")
         {
             RpcShowRollResults();
-            RpcUpdateTurn();
-            Debug.Log(gameManager.isMyTurn);
         }
     }
 
     [ClientRpc]
-    void RpcUpdateTurn()
+    void RpcDestroyDie()
     {
-        Debug.Log(gameManager.gameState);
-        if(gameManager.gameState == "Compile {HostTurn}")
-        {
-            if (isClientOnly)
-            {
-                gameManager.isMyTurn = false;
-            }
-            else
-            {
-                gameManager.isMyTurn = true;
-            }
-        }
-        if(gameManager.gameState == "Compile {ClientTurn}")
-        {
-            if (isClientOnly)
-            {
-                gameManager.isMyTurn = true;
-            }
-            else
-            {
-                gameManager.isMyTurn = false;
-            }
-        }
+        CmdDestroyDie();
     }
 
-    [TargetRpc]
-    public void TargetGiveTurn(GameObject target)
+    [ClientRpc]
+    void RpcChangeTurn()
     {
-        gameManager.isMyTurn = true;
+        gameManager.changeTurn();
     }
+
+
 
     [ClientRpc]
     public void RpcReenableRolling()
@@ -158,16 +147,37 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdRollPlanet()
     {
-        if (!gameManager.isMyTurn)
-        {
-            return;
-        }
         int rand = Random.Range(0, CentariousDie.Length);
         GameObject dice = Instantiate(CentariousDie[rand], new Vector2(0, 0), Quaternion.identity);
         NetworkServer.Spawn(dice, connectionToClient);
         RpcShowCentDie(dice, rand);
         RPCShowShip((rand == 0)? "ZERO": "ONE");
-        RpcGMChangeState("Execute {}");
+        RpcChangeTurn();
+        RpcChangeGameState("Execute {}");
+        StartCoroutine(WaitForExecute());
+    }
+
+    IEnumerator WaitForExecute()
+    {
+        //yield on a new YieldInstruction that waits for 1 seconds.
+        yield return new WaitForSeconds(1);
+        if(gameManager.gameState == "Execute {}")
+        {
+            CmdStartGame();
+        }
+        
+    }
+
+    [Command]
+    void CmdStartGame()
+    {
+
+    }
+
+    [ClientRpc]
+    void RpcChangeGameState(string state)
+    {
+        gameManager.ChangeGameState(state);
     }
 
     [ClientRpc]
@@ -243,7 +253,6 @@ public class PlayerManager : NetworkBehaviour
     void RpcShowRollResults()
     {
         uiManager.UpdateRollText(gameManager.myRoll, gameManager.hisRoll);
-
     }
     [Command]
     public void CmdDestroyDie()

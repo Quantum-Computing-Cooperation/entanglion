@@ -34,6 +34,11 @@ public class EngineDeckBehaviour : MonoBehaviour
     }
     public EngineCard drawCard()
     {
+        if((countMap[0] == 0 && countMap[1] == 0 && countMap[2] == 0 && countMap[3] == 0) && countMap[4] == 0)
+        {
+            reshuffle();
+        }
+
         if (firstTime)
         {
             if (countMap[0] == 0 && countMap[1] == 0 && countMap[2] == 0 && countMap[3] == 0)

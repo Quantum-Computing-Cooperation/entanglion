@@ -6,21 +6,29 @@ using Mirror;
 
 public class GameManager : NetworkBehaviour
 {
-    public string[] qcPlanets = new string[]{ "PSI_PLUS", "PSI_MINUS", "PHI_PLUS", "PHI_MINUS", "OMEGA_ONE",  "OMEGA_TWO", "OMEGA_THREE",  "OMEGA_ZERO" };
+    public string[] qcPlanets;
     public UIManager uiManager;
     [HideInInspector]
-    public int nPlanetRolls = 0;
+    public int nPlanetRolls;
     [HideInInspector]
-    public int nRolls = 0;
+    public int nRolls;
     [HideInInspector]
     public int myRoll;
     [HideInInspector]
     public int hisRoll;
-    [HideInInspector]
-    public string gameState = "Initialize {}";
-    [HideInInspector]
-    public bool isMyTurn = false;
-    public string shipPlanet = "ZERO";
+    public string gameState;
+    public bool isMyTurn;
+    public string shipPlanet;
+
+    private void Start()
+    {
+        nRolls = 0;
+        nPlanetRolls = 0;
+        qcPlanets = new string[] { "PSI_PLUS", "PSI_MINUS", "PHI_PLUS", "PHI_MINUS", "OMEGA_ONE", "OMEGA_TWO", "OMEGA_THREE", "OMEGA_ZERO" };
+        gameState = "Initialize {}";
+        isMyTurn = false;
+        shipPlanet = "ZERO";
+    }
 
     public void changeTurn()
     {
@@ -48,7 +56,7 @@ public class GameManager : NetworkBehaviour
         }else if (stateRequest == "Compile {}")
         {
             nPlanetRolls = 0;
-            if(nRolls == 1)
+            if(nRolls == 2)
             {
                 if (hisRoll == myRoll)
                 {
@@ -56,23 +64,24 @@ public class GameManager : NetworkBehaviour
                 }
                 else if(myRoll > hisRoll)
                 {
-                    gameState = "Compile {HostTurn}";
+                    gameState = "Compile {Higher}";
                     isMyTurn = true;
 
                 }
                 else
                 {
-                    gameState = "Compile {ClientTurn}";
+                    gameState = "Compile {Lower}";
                     isMyTurn = false;
                 }
             }
         }else if (stateRequest == "Execute {}")
         {
-            if (nPlanetRolls == 1)
-            {
-                stateRequest = "Started {}";
-            }
             nPlanetRolls++;
+            if (nPlanetRolls == 2)
+            {
+                gameState = "Execute {}";
+            }
+
         }
     }
 
